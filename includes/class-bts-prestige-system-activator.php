@@ -120,7 +120,7 @@ class Bts_Prestige_System_Activator {
 				'id_member bigint(20) UNSIGNED NOT NULL',
 				'id_member_approved bigint(20) UNSIGNED',
 				'id_officer_approved bigint(20) UNSIGNED',
-				'id_prestige_category bigint(20) UNSIGNED NOT NULL',
+				'id_prestige_category bigint(20) UNSIGNED',
 				"date_claimed datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 				"date_added datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 				"reward_amount int UNSIGNED NOT NULL",
@@ -140,7 +140,8 @@ class Bts_Prestige_System_Activator {
 				"date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 				'PRIMARY KEY  (id)',
 				"FOREIGN KEY (id_users) REFERENCES {$wpdb->prefix}users(ID)",
-				"FOREIGN KEY (id_prestige_rewards) REFERENCES {$prefix}prestige_rewards(id)"
+				"FOREIGN KEY (id_prestige_rewards) REFERENCES {$prefix}prestige_rewards(id)",
+				"FOREIGN KEY (id_officer) REFERENCES {$prefix}officers(id)",
 			]
 		];
 	}

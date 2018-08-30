@@ -12,6 +12,38 @@ class Bts_Prestige_System_Data_Import
 		$venues = self::import_venues($genres, $domains);
 		$users = self::import_users($domains);
 		$officers = self::import_officers($venues, $domains, $users);
+		$prestige_categories = self::import_prestige_categories();
+	}
+	
+	private static function fetch_prestige_category_records()
+	{
+		$stmt = self::$pdo->prepare('
+			SELECT
+				pcaID		AS id,
+				pcaTitle	AS name,
+				pcaCap		AS monthly_cap
+			FROM prestigecategories
+			');
+		$stmt->execute();
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+	
+	private static function import_prestige_categories()
+	{
+		global $wpdb;
+		$prefix = $wpdb->prefix.self::$dbPrefix;
+		$table = "{$prefix}prestige_categories";
+		$category_records = self::fetch_prestige_category_records();
+		$keyMap = [];
+		foreach($category_records as $record)
+		{
+			$wpdb->insert($table, [
+				'name'=>$record['name'],
+				'monthly_cap'=>$record['monthly_cap']
+			]);
+			$keyMap[$record['id']] = $wpdb->insert_id;
+		}
+		return $keyMap;
 	}
 	
 	private static function fetch_officer_records()

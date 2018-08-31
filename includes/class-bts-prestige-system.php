@@ -156,6 +156,7 @@ class Bts_Prestige_System {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action( 'admin_menu',			$plugin_admin, 'manage_club_structure');
 	}
 
 	/**
@@ -171,8 +172,8 @@ class Bts_Prestige_System {
 
 		$this->loader->add_action( 'wp_enqueue_scripts',		$plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts',		$plugin_public, 'enqueue_scripts' );
-		$this->add_profile_functions($plugin_public);
 		$this->loader->add_action( 'user_register',				$plugin_public, 'post_register_action' );
+		$this->add_profile_functions($plugin_public);
 	}
 	
 	/**

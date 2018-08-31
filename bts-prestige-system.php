@@ -37,6 +37,8 @@ if ( ! defined( 'WPINC' ) ) {
  */
 define( 'PLUGIN_NAME_VERSION', '1.0.0' );
 
+define( 'BTS_TABLE_PREFIX', 'bts_');
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-bts-prestige-system-activator.php

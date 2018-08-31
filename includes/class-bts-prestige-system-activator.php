@@ -23,7 +23,6 @@
 
 class Bts_Prestige_System_Activator {
 
-	private static $dbPrefix = 'bts_';
 	/**
 	 * Short Description. Build the databases.
 	 *
@@ -45,7 +44,7 @@ class Bts_Prestige_System_Activator {
 	public static function buildDatabaseTables()
 	{
 		global $wpdb;
-		$prefix = $wpdb->prefix.self::$dbPrefix;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		$charset_collate = $wpdb->get_charset_collate();
 		$tables = self::getTables();
 		require_once(ABSPATH.'wp-admin/includes/upgrade.php');
@@ -67,7 +66,7 @@ class Bts_Prestige_System_Activator {
 	public static function getTables()
 	{
 		global $wpdb;
-		$prefix = $wpdb->prefix.self::$dbPrefix;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		
 		return [
 			'domains'=>[
@@ -97,17 +96,25 @@ class Bts_Prestige_System_Activator {
 				"FOREIGN KEY (id_domains) REFERENCES {$prefix}domains(id)",
 				"FOREIGN KEY (id_genres) REFERENCES {$prefix}genres(id)",
 			],
+			'officer_types'=>[
+				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
+				'officer_type varchar(255) NOT NULL',
+				'type ENUM("Storyteller", "Coordinator")',
+				'PRIMARY KEY  (id)',
+			],
 			'officers'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
 				'id_venues bigint(20) UNSIGNED',
 				'id_domains bigint(20) UNSIGNED',
 				'id_member bigint(20) UNSIGNED',
-				'position varchar(255)',
+				'id_officer_type bigint(20) UNSIGNED NOT NULL',
+				'title varchar(255)',
 				'email varchar(255)',
 				'PRIMARY KEY  (id)',
 				"FOREIGN KEY (id_member) REFERENCES {$wpdb->prefix}users(ID)",
 				"FOREIGN KEY (id_venues) REFERENCES {$prefix}venues(id)",
-				"FOREIGN KEY (id_domains) REFERENCES {$prefix}domains(id)"
+				"FOREIGN KEY (id_domains) REFERENCES {$prefix}domains(id)",
+				"FOREIGN KEY (id_officer_type) REFERENCES {$prefix}officer_types(id)"
 			],
 			'prestige_categories'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
@@ -149,7 +156,7 @@ class Bts_Prestige_System_Activator {
 	public static function deactivate()
 	{
 		global $wpdb;
-		$prefix = $wpdb->prefix.self::$dbPrefix;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		$tableNames = array_reverse(array_keys(self::getTables()));
 		foreach($tableNames as $table)
 		{

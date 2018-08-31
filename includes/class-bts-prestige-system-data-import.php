@@ -1,18 +1,18 @@
 <?php
 class Bts_Prestige_System_Data_Import
 {
-	private static $dbPrefix = 'bts_';
 	private static $pdo = null;
 	
-	public static function import($pdo)
+	public static function import($pdo, $db_prefix)
 	{
 		self::$pdo = $pdo;
 		$domains = self::import_domains();
 		$genres = self::import_genres();
 		$venues = self::import_venues($genres, $domains);
-		$users = self::import_users($domains);
+		/*$users = self::import_users($domains);
 		$officers = self::import_officers($venues, $domains, $users);
 		$prestige_categories = self::import_prestige_categories();
+		self::import_prestige($users, $officers, $prestige_categories);*/
 	}
 	
 	private static function fetch_prestige_category_records()
@@ -31,7 +31,7 @@ class Bts_Prestige_System_Data_Import
 	private static function import_prestige_categories()
 	{
 		global $wpdb;
-		$prefix = $wpdb->prefix.self::$dbPrefix;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		$table = "{$prefix}prestige_categories";
 		$category_records = self::fetch_prestige_category_records();
 		$keyMap = [];
@@ -46,10 +46,22 @@ class Bts_Prestige_System_Data_Import
 		return $keyMap;
 	}
 	
+	private static function fetch_prestige_records()
+	{
+		$stmt = self::$pdo->prepare('SELECT * FROM prestigelog');
+		$stmt->execute();
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+	
+	private static function import_prestige($users, $officers, $prestige_categories)
+	{
+		$prestige_records = self::fetch_prestige_records();
+		
+	}
+	
 	private static function fetch_officer_records()
 	{
-		$stmt = self::$pdo->prepare('
-			SELECT
+		$stmt = self::$pdo->prepare('SELECT
 				p.posID				AS id,
 				p.posTitle			AS position,
 				p.posEmail			AS email,
@@ -60,15 +72,13 @@ class Bts_Prestige_System_Data_Import
 				position p
 				LEFT JOIN entity e ON (p.fk_ent_belongsTo = e.entID)
 			ORDER BY
-				id
-			');
+				id');
 		$stmt->execute();
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		$officer_records = ['domain'=>[], 'venue'=>[]];
 		foreach($rows as $row)
 		{
-			$key = $row['old_entity_type'] < 3 ? 'domain': 'venue';
-			$officer_records[$key][] = $row;
+			$officer_records[$row['old_entity_type'] < 3 ? 'domain': 'venue'][] = $row;
 		}
 		return $officer_records;
 	}
@@ -76,24 +86,16 @@ class Bts_Prestige_System_Data_Import
 	private static function add_officer($officer_record, $domain_id, $venue_id, $user_id)
 	{
 		global $wpdb;
-		$prefix = $wpdb->prefix.self::$dbPrefix;
+		$prefix = $wpdb->prefix.self::BTS_TABLE_PREFIX;
 		$table = "{$prefix}officers";
-		$user_id = $user_id?$user_id:1;
 		$data = [
 			'position'=>$officer_record['position'],
 			'email'=>$officer_record['email'],
-			'id_member'=>$user_id
+			'id_member'=>$user_id?$user_id:1
 		];
 		$keyMap = [];
-		
-		if($domain_id)
-		{
-			$data['id_domains'] = $domain_id;
-		}
-		if($venue_id)
-		{
-			$data['id_venues'] = $venue_id;
-		}
+		if($domain_id){ $data['id_domains'] = $domain_id;}
+		if($venue_id){ $data['id_venues'] = $venue_id;}
 		if($data['id_member'])
 		{
 			$wpdb->insert($table, $data);
@@ -188,7 +190,7 @@ class Bts_Prestige_System_Data_Import
 		$stmt = self::$pdo->prepare('SELECT gnrID as old_id, gnrName as name FROM `genre`');
 		$stmt->execute();
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		$prefix = $wpdb->prefix.self::$dbPrefix;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		$table = "{$prefix}genres";
 		$keyMap = [];
 		foreach($rows as $row)
@@ -219,7 +221,7 @@ class Bts_Prestige_System_Data_Import
 	private static function add_venue($row)
 	{
 		global $wpdb;
-		$prefix = $wpdb->prefix.self::$dbPrefix;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		$table = "{$prefix}venues";
 		$rows_to_ignore = ['id', 'old_id_domains', 'old_id_genres'];
 		$data = [];
@@ -279,7 +281,7 @@ class Bts_Prestige_System_Data_Import
 	private static function add_domain($row)
 	{
 		global $wpdb;
-		$prefix = $wpdb->prefix.self::$dbPrefix;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		$table = "{$prefix}domains";
 		$data = [
 			'name'=>$row['name'],

@@ -96,25 +96,20 @@ class Bts_Prestige_System_Activator {
 				"FOREIGN KEY (id_domains) REFERENCES {$prefix}domains(id)",
 				"FOREIGN KEY (id_genres) REFERENCES {$prefix}genres(id)",
 			],
-			'officer_types'=>[
-				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
-				'officer_type varchar(255) NOT NULL',
-				'type ENUM("Storyteller", "Coordinator")',
-				'PRIMARY KEY  (id)',
-			],
 			'officers'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
 				'id_venues bigint(20) UNSIGNED',
 				'id_domains bigint(20) UNSIGNED',
 				'id_member bigint(20) UNSIGNED',
-				'id_officer_type bigint(20) UNSIGNED NOT NULL',
+				'id_superior bigint(20) UNSIGNED',
 				'title varchar(255)',
 				'email varchar(255)',
+				'chain ENUM("Coordinator", "Storyteller") DEFAULT "Coordinator"',
 				'PRIMARY KEY  (id)',
 				"FOREIGN KEY (id_member) REFERENCES {$wpdb->prefix}users(ID)",
 				"FOREIGN KEY (id_venues) REFERENCES {$prefix}venues(id)",
 				"FOREIGN KEY (id_domains) REFERENCES {$prefix}domains(id)",
-				"FOREIGN KEY (id_officer_type) REFERENCES {$prefix}officer_types(id)"
+				"FOREIGN KEY (id_superior) REFERENCES {$prefix}officers(id)",
 			],
 			'prestige_categories'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',

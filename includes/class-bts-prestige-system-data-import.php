@@ -3,15 +3,15 @@ class Bts_Prestige_System_Data_Import
 {
 	private static $pdo = null;
 	
-	public static function import($pdo, $db_prefix)
+	public static function import($pdo)
 	{
 		self::$pdo = $pdo;
 		$domains = self::import_domains();
 		$genres = self::import_genres();
 		$venues = self::import_venues($genres, $domains);
-		/*$users = self::import_users($domains);
+		$users = self::import_users($domains);
 		$officers = self::import_officers($venues, $domains, $users);
-		$prestige_categories = self::import_prestige_categories();
+		/*$prestige_categories = self::import_prestige_categories();
 		self::import_prestige($users, $officers, $prestige_categories);*/
 	}
 	
@@ -22,8 +22,7 @@ class Bts_Prestige_System_Data_Import
 				pcaID		AS id,
 				pcaTitle	AS name,
 				pcaCap		AS monthly_cap
-			FROM prestigecategories
-			');
+			FROM prestigecategories');
 		$stmt->execute();
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
@@ -62,12 +61,13 @@ class Bts_Prestige_System_Data_Import
 	private static function fetch_officer_records()
 	{
 		$stmt = self::$pdo->prepare('SELECT
-				p.posID				AS id,
-				p.posTitle			AS position,
-				p.posEmail			AS email,
-				p.fk_mem_holder		AS old_member_id,
-				p.fk_ent_belongsTo	AS old_entity_id,
-				e.fk_ett_type		AS old_entity_type
+				p.posID					AS id,
+				p.posTitle				AS title,
+				p.posEmail				AS email,
+				p.fk_mem_holder			AS old_member_id,
+				p.fk_ent_belongsTo		AS old_entity_id,
+				p.fk_pos_assistantTo	AS id_superior,
+				e.fk_ett_type			AS old_entity_type
 			FROM
 				position p
 				LEFT JOIN entity e ON (p.fk_ent_belongsTo = e.entID)
@@ -86,12 +86,14 @@ class Bts_Prestige_System_Data_Import
 	private static function add_officer($officer_record, $domain_id, $venue_id, $user_id)
 	{
 		global $wpdb;
-		$prefix = $wpdb->prefix.self::BTS_TABLE_PREFIX;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		$table = "{$prefix}officers";
+		$chain = strpos($officer_record['title'], 'tory') !== FALSE?'Storyteller':'Coordinator';
 		$data = [
-			'position'=>$officer_record['position'],
+			'title'=>$officer_record['title'],
 			'email'=>$officer_record['email'],
-			'id_member'=>$user_id?$user_id:1
+			'id_member'=>$user_id?$user_id:1,
+			'chain'=>$chain
 		];
 		$keyMap = [];
 		if($domain_id){ $data['id_domains'] = $domain_id;}
@@ -102,6 +104,18 @@ class Bts_Prestige_System_Data_Import
 			$keyMap[$officer_record['id']] = $wpdb->insert_id;
 		}
 		return $keyMap;
+	}
+	
+	public static function update_officer_heirarchy($id_officer, $id_superior)
+	{
+		global $wpdb;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+		$table = "{$prefix}officers";
+		$wpdb->update(
+			$table,
+			['id_superior'=>$id_superior],
+			['id'=>$id_officer]
+		);
 	}
 	
 	private static function import_officers($venues, $domains, $users)
@@ -121,6 +135,9 @@ class Bts_Prestige_System_Data_Import
 			$user_id = $officer_record['old_member_id'] ? $users[$officer_record['old_member_id']]: null;
 			$keyMap[$officer_record['id']] = self::add_officer($officer_record, null, $venue_id, $user_id);
 		}
+		
+		
+		
 		return $keyMap;
 	}
 	

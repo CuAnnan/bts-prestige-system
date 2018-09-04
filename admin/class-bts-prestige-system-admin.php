@@ -1,4 +1,5 @@
 <?php
+require_once plugin_dir_path( __FILE__ ).'class-bts-prestige-system-domains.php';
 
 /**
  * The admin-specific functionality of the plugin.
@@ -72,9 +73,10 @@ class Bts_Prestige_System_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/bts-prestige-system-admin.css', array(), $this->version, 'all' );
-
+		wp_register_style('prefix_bootstrap', '//stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css');
+		wp_enqueue_style('prefix_bootstrap');
+		wp_enqueue_style( $this->plugin_name.'autocomplete', plugin_dir_url( __FILE__ ) . 'css/bts-prestige-system-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name.'admin', plugin_dir_url( __FILE__ ) . 'css/easy-autocomplete.min.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -95,14 +97,16 @@ class Bts_Prestige_System_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/bts-prestige-system-admin.js', array( 'jquery' ), $this->version, false );
-
+		
+		wp_register_script('prefix_bootstrap', '//stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js');
+		wp_enqueue_script('prefix_bootstrap');
+		wp_enqueue_script( $this->plugin_name.'autocomplete', plugin_dir_url( __FILE__ ) . 'js/jquery.easy-autocomplete.min.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name.'admin', plugin_dir_url( __FILE__ ) . 'js/bts-prestige-system-admin.js', array( 'jquery' ), $this->version, false );
 	}
 	
 	public function manage_club_structure()
 	{
-		if(!current_user_can('manage_club_structure') && $this->is_admin())
+		if(!current_user_can('manage_club_structure') && !$this->user_is_admin())
 		{
 			return;
 		}
@@ -115,22 +119,9 @@ class Bts_Prestige_System_Admin {
 		);
 	}
 	
-	private function is_admin()
+	private function user_is_admin()
 	{
 		return in_array('administrator',  wp_get_current_user()->roles);
-	}
-	
-	private function holds_venue_office($loggedInUserId, $positionType, $venue_name, $domain_name)
-	{
-		
-	}
-	
-	private function holds_domain_office($loggedInUserId, $positionType, $domain_name)
-	{
-		global $wpdb;
-		require_once('');
-		// this should be 1 or zero
-		$countOfficers = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}{BTS_TABLE_PREFIX}officers WHERE id_members = %d AND positioin = %s", [$loggedInUserId, $position]));
 	}
 	
 	/**
@@ -139,13 +130,11 @@ class Bts_Prestige_System_Admin {
 	public function manage_club_structure_page()
 	{
 		
-		if(!$this->is_admin() && !$this->holds_office('national_membership_coordinator'))
+		if(!$this->user_is_admin() && !current_user_can('manage_club_structure'))
 		{
 			wp_die('This is not permitted for your account');
 		}
-		echo '<div class="wrap">';
-		
-		echo '</div>';
+		Bts_Prestige_System_Domains::show_domain_management_page();
 	}
 	
 	

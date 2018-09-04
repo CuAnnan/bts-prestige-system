@@ -6,11 +6,11 @@ class Bts_Prestige_System_Data_Import
 	public static function import($pdo)
 	{
 		self::$pdo = $pdo;
-		$domains = self::import_domains();
-		$genres = self::import_genres();
-		$venues = self::import_venues($genres, $domains);
-		$users = self::import_users($domains);
-		$officers = self::import_officers($venues, $domains, $users);
+		$domainMap = self::import_domains();
+		$genreMap = self::import_genres();
+		list($venueMap, $venuesDomainMap) = self::import_venues($genreMap, $domainMap);
+		$userMap = self::import_users($domainMap);
+		$officerMap = self::import_officers($userMap, $venueMap, $domainMap, $venuesDomainMap);
 		/*$prestige_categories = self::import_prestige_categories();
 		self::import_prestige($users, $officers, $prestige_categories);*/
 	}
@@ -66,7 +66,8 @@ class Bts_Prestige_System_Data_Import
 				p.posEmail				AS email,
 				p.fk_mem_holder			AS old_member_id,
 				p.fk_ent_belongsTo		AS old_entity_id,
-				p.fk_pos_assistantTo	AS id_superior,
+				p.fk_pos_assistantTo	AS old_id_superior,
+				p.posDateGained			AS date_appointed,
 				e.fk_ett_type			AS old_entity_type
 			FROM
 				position p
@@ -74,13 +75,7 @@ class Bts_Prestige_System_Data_Import
 			ORDER BY
 				id');
 		$stmt->execute();
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		$officer_records = ['domain'=>[], 'venue'=>[]];
-		foreach($rows as $row)
-		{
-			$officer_records[$row['old_entity_type'] < 3 ? 'domain': 'venue'][] = $row;
-		}
-		return $officer_records;
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 	
 	private static function add_officer($officer_record, $domain_id, $venue_id, $user_id)
@@ -92,18 +87,19 @@ class Bts_Prestige_System_Data_Import
 		$data = [
 			'title'=>$officer_record['title'],
 			'email'=>$officer_record['email'],
-			'id_member'=>$user_id?$user_id:1,
-			'chain'=>$chain
+			'id_users'=>$user_id?$user_id:1,
+			'chain'=>$chain,
+			'date_appointed'=>$officer_record['date_appointed']
 		];
-		$keyMap = [];
 		if($domain_id){ $data['id_domains'] = $domain_id;}
 		if($venue_id){ $data['id_venues'] = $venue_id;}
-		if($data['id_member'])
+		$idOfficer = null;
+		if($data['id_users'])
 		{
 			$wpdb->insert($table, $data);
-			$keyMap[$officer_record['id']] = $wpdb->insert_id;
+			$idOfficer = $wpdb->insert_id;
 		}
-		return $keyMap;
+		return $idOfficer;
 	}
 	
 	public static function update_officer_heirarchy($id_officer, $id_superior)
@@ -118,25 +114,28 @@ class Bts_Prestige_System_Data_Import
 		);
 	}
 	
-	private static function import_officers($venues, $domains, $users)
+	private static function import_officers($users, $venues, $domains, $venueDomainsMap)
 	{
 		$officer_records = self::fetch_officer_records();
-		$keyMap = [];
+		$keyMap = []; $subordinates = [];
 		
-		foreach($officer_records['domain'] as $officer_record)
+		foreach($officer_records as $officer_record)
 		{
-			$domain_id = $domains[$officer_record['old_entity_id']];
+			$venue_id  = $officer_record['old_entity_type'] < 3 ? null : $venues[$officer_record['old_entity_id']];
+			$domain_id = $officer_record['old_entity_type'] < 3 ? $domains[$officer_record['old_entity_id']] :$venueDomainsMap[$venue_id];
 			$user_id = $officer_record['old_member_id'] ? $users[$officer_record['old_member_id']]: null;
-			$keyMap[$officer_record['id']] = self::add_officer($officer_record, $domain_id, null, $user_id);
+			$new_id = self::add_officer($officer_record, $domain_id, $venue_id, $user_id);
+			$keyMap[$officer_record['id']] = $new_id;
+			if($officer_record['old_id_superior'] != 0)
+			{
+				$subordinates[$new_id] = $officer_record['old_id_superior'];
+			}
 		}
-		foreach($officer_records['venue'] as $officer_record)
+		foreach($subordinates as $id_officer=>$old_id_superior)
 		{
-			$venue_id = $venues[$officer_record['old_entity_id']];
-			$user_id = $officer_record['old_member_id'] ? $users[$officer_record['old_member_id']]: null;
-			$keyMap[$officer_record['id']] = self::add_officer($officer_record, null, $venue_id, $user_id);
+			$id_superior = $keyMap[$old_id_superior];
+			self::update_officer_heirarchy($id_officer, $id_superior);
 		}
-		
-		
 		
 		return $keyMap;
 	}
@@ -145,18 +144,19 @@ class Bts_Prestige_System_Data_Import
 	{
 		$stmt = self::$pdo->prepare('
 			SELECT
-				m.memID			AS id,
-				m.memFirstName	AS first_name,
-				m.memLastName	AS last_name,
-				m.memEmail		AS email,
-				m.memNumber		AS membership_number,
-				m.memExpiry		AS membership_renewal_date,
-				m.memAddress	AS address_1,
-				m.memCity		AS address_2,
-				m.memState		AS state,
-				m.memPostCode	AS zip,
-				m.memDOB		AS date_of_birth,
-				e.entTitle		AS domain
+				m.memID				AS id,
+				m.memFirstName		AS first_name,
+				m.memLastName		AS last_name,
+				m.memEmail			AS email,
+				m.memNumber			AS membership_number,
+				m.memExpiry			AS membership_renewal_date,
+				m.memAddress		AS address_1,
+				m.memCity			AS address_2,
+				m.memState			AS state,
+				m.memPostCode		AS zip,
+				m.memDOB			AS date_of_birth,
+				m.fk_ent_memberOf	AS old_id_domains,
+				e.entTitle			AS domain
 			FROM
 				member m
 				LEFT JOIN entity e ON (m.fk_ent_memberOf = e.entID)');
@@ -166,7 +166,7 @@ class Bts_Prestige_System_Data_Import
 	
 	private static function map_user_meta_data($new_member_id, $member_record)
 	{
-		$fields_to_ignore = ['id', 'email'];
+		$fields_to_ignore = ['id', 'email', 'old_id_domains'];
 		foreach($member_record as $field=>$data)
 		{
 			if(!in_array($field, $fields_to_ignore))
@@ -186,7 +186,7 @@ class Bts_Prestige_System_Data_Import
 		return wp_create_user($memberRecord['membership_number'], $password);		
 	}
 	
-	private static function import_users()
+	private static function import_users($domainMap)
 	{
 		$memberRecords = self::fetch_members();
 		$keyMap = [];
@@ -194,7 +194,9 @@ class Bts_Prestige_System_Data_Import
 		{
 			if($memberRecord['membership_number'])
 			{
-				$keyMap[$memberRecord['id']] = self::add_user_record($memberRecord);
+				$user_id = self::add_user_record($memberRecord);
+				$memberRecord['id_domains'] = $domainMap[$memberRecord['old_id_domains']];
+				$keyMap[$memberRecord['id']] = $user_id;
 				self::map_user_meta_data($user_id, $memberRecord);
 			}
 		}
@@ -257,13 +259,16 @@ class Bts_Prestige_System_Data_Import
 	{
 		$rows = self::fetch_old_venue_rows();
 		$keyMap = [];
+		$venuesDomainsMap = [];
 		foreach($rows as $row)
 		{
 			$row['id_domains'] = $domains[$row['old_id_domains']];
 			$row['id_genres'] = $genres[$row['old_id_genres']];
-			$keyMap[$row['id']] = self::add_venue($row);
+			$id_venues = self::add_venue($row);
+			$keyMap[$row['id']] = $id_venues;
+			$venuesDomainsMap[$id_venues] = $row['id_domains'];
 		}
-		return $keyMap;
+		return [$keyMap, $venuesDomainsMap];
 	}
 	
 	private static function map_domain_structure($oldParentIds, $keyMap)

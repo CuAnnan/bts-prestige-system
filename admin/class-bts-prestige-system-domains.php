@@ -45,17 +45,32 @@ class Bts_Prestige_System_Domains
 				{$prefix}domains d");
 	}
 	
-	public static function show_domain_management_page()
+	public static function get_managed_domains()
 	{
-		$managed_domains = null;
 		if(array_intersect(['administrator', 'national_membership_coordinator'],  wp_get_current_user()->roles))
 		{
-			$managed_domains = self::get_all_domains();
+			return self::get_all_domains();
 		}
 		else
 		{
-			$managed_domains = self::get_managed_domains_for_logged_in_user();
+			return self::get_managed_domains_for_logged_in_user();
 		}
+	}
+	
+	public static function get_managed_domain_ids()
+	{
+		$managed_domains = self::get_managed_domains();
+		$ids = [];
+		foreach($managed_domains as $domain)
+		{
+			$ids[] = $domain->id;
+		}
+		return $ids;
+	}
+	
+	public static function show_domain_management_page()
+	{
+		$managed_domains = self::get_managed_domains();
 		$officers	= Bts_Prestige_System_Offices::get_offices_by_id_domains($managed_domains);
 		$genres		= Bts_Prestige_System_Genres::get_genres();
 		require_once plugin_dir_path(__FILE__).'/partials/bts-prestige-system-management-page.php';

@@ -1,10 +1,5 @@
 <?php
-
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-domains.php';
 
 class Bts_Prestige_System_Offices
 {
@@ -43,23 +38,24 @@ class Bts_Prestige_System_Offices
 				g.id				AS id_genres,
 				g.name				AS genre_name
 			FROM 
-							wp_bts_officers o
-				LEFT JOIN	wp_users 	u 		ON (o.id_users = u.ID)
-                LEFT JOIN	wp_usermeta um_fn 	ON (u.ID = um_fn.user_id)
-                LEFT JOIN	wp_usermeta um_sn 	ON (u.ID = um_sn.user_id)
-                LEFT JOIN	wp_usermeta um_cn	ON (u.ID = um_cn.user_id)
-				LEFT JOIN	wp_bts_venues v		ON (o.id_venues = v.id)
-				LEFT JOIN	wp_bts_genres g		ON (v.id_genres = g.id)
+							{$prefix}officers		o
+				LEFT JOIN	{$wpdb->prefix}users	u 		ON (o.id_users = u.ID)
+                LEFT JOIN	{$wpdb->prefix}usermeta	um_fn 	ON (u.ID = um_fn.user_id)
+                LEFT JOIN	{$wpdb->prefix}usermeta	um_sn 	ON (u.ID = um_sn.user_id)
+                LEFT JOIN	{$wpdb->prefix}usermeta	um_cn	ON (u.ID = um_cn.user_id)
+				LEFT JOIN	{$prefix}venues			v		ON (o.id_venues = v.id)
+				LEFT JOIN	{$prefix}genres			g		ON (v.id_genres = g.id)
             WHERE
-				um_fn.meta_key = 'first_name'
-				AND um_sn.meta_key = 'last_name'
-				AND um_cn.meta_key = 'membership_number'
-				AND o.id_domains IN (".join($place_holders, ', ').")
-				AND (o.id_venues IS NULL OR v.active = 1)
+					um_fn.meta_key = 'first_name'
+				AND	um_sn.meta_key = 'last_name'
+				AND	um_cn.meta_key = 'membership_number'
+				AND	o.id_domains IN (".join($place_holders, ', ').")
+				AND	(o.id_venues IS NULL OR v.active = 1)
 			ORDER BY
 				`id_domains` ASC,
 				id_genres ASC,
 				chain ASC,
+				id_officers ASC,
 				id_superior ASC
 			",
 			$id_domains
@@ -76,4 +72,31 @@ class Bts_Prestige_System_Offices
 		}
 		return $offices;
 	}
+	
+	public function update_office($id_domains, $id_officers, $fields)
+	{
+		$domains = Bts_Prestige_System_Domains::get_managed_domain_ids();
+		if(array_search($id_domains, $domains) === false)
+		{
+			return ['success'=>false,'error'=>'domain not in user purview'];
+		}
+		global $wpdb;
+		unset($fields['action']);
+		foreach($fields as $key=>$val)
+		{
+			if(!$val)
+			{
+				unset($fields[$key]);
+			}
+		}
+		$table = $wpdb->prefix.BTS_TABLE_PREFIX."officers";
+		$wpdb->update(
+			$table,
+			$fields,
+			['id'=>$id_officers]
+		);
+		
+		return ['success'=>true];
+	}
+	
 }

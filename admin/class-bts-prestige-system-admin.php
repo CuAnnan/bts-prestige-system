@@ -1,5 +1,6 @@
 <?php
 require_once plugin_dir_path( __FILE__ ).'class-bts-prestige-system-domains.php';
+require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-offices.php';
 
 /**
  * The admin-specific functionality of the plugin.
@@ -135,6 +136,17 @@ class Bts_Prestige_System_Admin {
 			wp_die('This is not permitted for your account');
 		}
 		Bts_Prestige_System_Domains::show_domain_management_page();
+	}
+	
+	public function update_office()
+	{
+		header("Content-type: text/json");
+		echo json_encode(Bts_Prestige_System_Offices::update_office(
+			filter_input(INPUT_POST, 'id_domains'),
+			filter_input(INPUT_POST, 'id'),
+			$_POST
+		));
+		exit();
 	}
 	
 	

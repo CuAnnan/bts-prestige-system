@@ -34,7 +34,8 @@ foreach($users as $user_id)
 	$meta['id'] = $user_id->id;
     $usersMetaData[] = $meta;
 }
-echo '<script type="text/json" id="allUsersMeta">'.json_encode($usersMetaData).'</script>';
+echo '<script type="text/json" id="allUsersMeta">'.json_encode($usersMetaData).'</script>'."\n";
+echo '<script type="text/json" id="officerHeirarchy">'.json_encode($officers).'</script>';
 ?>
 	<table>
 	<?php
@@ -81,10 +82,17 @@ echo '<script type="text/json" id="allUsersMeta">'.json_encode($usersMetaData).'
 			</div>
 			<div class="modal-body">
 				<div class="container">
+					<input type="hidden" id="office_edit_id_officers"/>
+					<input type="hidden" id="office_edit_id_users"/>
+					<input type="hidden" id="office_edit_first_name"/>
+					<input type="hidden" id="office_edit_last_name"/>
+					<input type="hidden" id="office_edit_id_domains"/>
+					<input type="hidden" id="office_edit_membership_number"/>
+					
 					<div class="row">
-						<label for="office-genre" class="col-sm-4 col-form-label">Genre</label>
+						<label for="office_edit_office-genre" class="col-sm-4 col-form-label">Genre</label>
 						<div class="col">
-							<select id="office-genre" class="form-control">
+							<select id="office_edit_office-genre" class="form-control">
 								<option value="">Domain level office</option>
 								<?php 
 									foreach($genres as $genre)
@@ -97,16 +105,24 @@ echo '<script type="text/json" id="allUsersMeta">'.json_encode($usersMetaData).'
 						</div>
 					</div>
 					<div class="row">
-						<label for="office-title" class="col-sm-4 col-form-label">Position</label>
-						<div class="col"><input type="text" class="form-control" id="office-title"/></div>
+						<label for="office_edit_office-title" class="col-sm-4 col-form-label">Position</label>
+						<div class="col"><input type="text" class="form-control" id="office_edit_office-title"/></div>
 					</div>
 					<div class="row">
-						<label for="office-member" class="col-sm-4 col-form-label">Position holder</label>
-						<div class="col"><input type="text" class="form-control" id="office-member"/></div>
+						<label for="office_edit_office-member" class="col-sm-4 col-form-label">Position holder</label>
+						<div class="col"><input type="text" class="form-control" id="office_edit_office-member"/></div>
 					</div>
 					<div class="row">
-						<label for="office-date" class="col-sm-4 col-form-label">Date appointed</label>
-						<div class="col"><input type="date" class="form-control" id="office-date"/></div>
+						<label for="office_edit_id_superior" class="col-sm-4 col-form-label">Superior</label>
+						<div class="col"><select id="office_edit_id_superior" class="form-control"></select></div>
+					</div>
+					<div class="row">
+						<label for="office_edit_email" class="col-sm-4 col-form-label">Email Address</label>
+						<div class="col"><input type="text" class="form-control" id="office_edit_email"/></div>
+					</div>
+					<div class="row">
+						<label for="office_edit_office-date" class="col-sm-4 col-form-label">Date appointed</label>
+						<div class="col"><input type="date" class="form-control" id="office_edit_office-date"/></div>
 					</div>
 				</div>
 			</div>

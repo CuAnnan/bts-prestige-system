@@ -34,7 +34,7 @@ class Bts_Prestige_System_Activator {
 	{
 		self::buildDatabaseTables();
 		require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-data-import.php';
-		Bts_Prestige_System_Data_Import::import(new PDO('mysql:host=localhost;dbname=camaus2', 'root'));
+		Bts_Prestige_System_Data_Import::import(new PDO('mysql:host=localhost;dbname=camaus2', 'old_db_dba'));
 	}
 	
 	/**

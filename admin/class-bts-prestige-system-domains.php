@@ -25,7 +25,9 @@ class Bts_Prestige_System_Domains
 				{$prefix}officers o
 				LEFT JOIN {$prefix}domains d ON (o.id_domains = d.id)
 			WHERE
-				o.id_users = %d",
+					o.id_users = %d
+				AND o.id_genres IS NULL	
+				AND	o.id_superior IS NULL",
 			get_current_user_id()
 		));
 	}
@@ -68,12 +70,18 @@ class Bts_Prestige_System_Domains
 		return $ids;
 	}
 	
+	public static function manages_domain($id_domains)
+	{
+		$domains = self::get_managed_domain_ids();
+		
+		return (array_search($id_domains, $domains) !== false);
+	}
+	
 	public static function show_domain_management_page()
 	{
 		$managed_domains = self::get_managed_domains();
 		$officers	= Bts_Prestige_System_Offices::get_offices_by_id_domains($managed_domains);
 		$genres		= Bts_Prestige_System_Genres::get_genres();
 		require_once plugin_dir_path(__FILE__).'/partials/bts-prestige-system-management-page.php';
-		
 	}
 }

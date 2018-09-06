@@ -55,11 +55,11 @@ echo '<script type="text/json" id="officerHeirarchy">'.json_encode($officers).'<
 				{
 					foreach($officers[$managed_domain->id] as $officer){ ?>
 					<tr <?php echo convert_officer_row_to_data($officer); ?>>
-						<td><?php echo $officer->title ?></td>
-						<td><?php echo $officer->genre_name?$officer->genre_name:'&nbsp;'; ?></td>
-						<td><?php echo $officer->first_name.' '.$officer->last_name; ?></td>
-						<td><?php echo $officer->membership_number; ?></td>
-						<td><?php echo $officer->date_appointed; ?></td>
+						<td class="tr_office_title"><?php echo $officer->title ?></td>
+						<td class="tr_office_genre_name"><?php echo $officer->genre_name?$officer->genre_name:'&nbsp;'; ?></td>
+						<td class="tr_office_name"><?php echo $officer->first_name.' '.$officer->last_name; ?></td>
+						<td class="tr_office_membership_number"><?php echo $officer->membership_number; ?></td>
+						<td class="tr_office_date_appointed"><?php echo $officer->date_appointed; ?></td>
 						<td><button class="btn btn-sm btn-primary btn_edit_office">Edit</button></td>
 						<td><button class="btn btn-sm btn-danger btn_delete_office">Delete</button></td>
 					</tr>
@@ -87,26 +87,21 @@ echo '<script type="text/json" id="officerHeirarchy">'.json_encode($officers).'<
 					<input type="hidden" id="office_edit_first_name"/>
 					<input type="hidden" id="office_edit_last_name"/>
 					<input type="hidden" id="office_edit_id_domains"/>
+					<input type="hidden" id="office_edit_id_venues"/>
 					<input type="hidden" id="office_edit_membership_number"/>
 					
 					<div class="row">
-						<label for="office_edit_office-genre" class="col-sm-4 col-form-label">Genre</label>
-						<div class="col">
-							<select id="office_edit_office-genre" class="form-control">
-								<option value="">Domain level office</option>
-								<?php 
-									foreach($genres as $genre)
-								{?>
-								<option value="<?php echo $genre->id?>?"><?php echo $genre->name; ?></option>
-								<?php
-								}
-								?>
-							</select>
-						</div>
-					</div>
-					<div class="row">
 						<label for="office_edit_office-title" class="col-sm-4 col-form-label">Position</label>
 						<div class="col"><input type="text" class="form-control" id="office_edit_office-title"/></div>
+					</div>
+					<div class="row">
+						<label for="office_edit_chain" class="col-sm-4 col-form-label">Chain</label>
+						<div class="col">
+							<select id="office_edit_chain">
+								<option>Coordinator</option>
+								<option>Storyteller</option>
+							</select>
+						</div>
 					</div>
 					<div class="row">
 						<label for="office_edit_office-member" class="col-sm-4 col-form-label">Position holder</label>

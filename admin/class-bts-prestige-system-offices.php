@@ -73,15 +73,9 @@ class Bts_Prestige_System_Offices
 		return $offices;
 	}
 	
-	public function update_office($id_domains, $id_officers, $fields)
+	private static function prepare_office_fields($fields)
 	{
-		$domains = Bts_Prestige_System_Domains::get_managed_domain_ids();
-		if(array_search($id_domains, $domains) === false)
-		{
-			return ['success'=>false,'error'=>'domain not in user purview'];
-		}
-		global $wpdb;
-		unset($fields['action']);
+		unset($fields['action'], $fields['genre_name']);
 		foreach($fields as $key=>$val)
 		{
 			if(!$val)
@@ -89,12 +83,24 @@ class Bts_Prestige_System_Offices
 				unset($fields[$key]);
 			}
 		}
+		return $fields;
+	}
+	
+	public static function update_office($id_domains, $id_officers, $fields)
+	{
+		global $wpdb;
+		if(!Bts_Prestige_System_Domains::manages_domain($id_domains))
+		{
+			return ['success'=>false,'error'=>'domain not in user purview'];
+		}
+		$fields = self::prepare_office_fields($fields);
+		
 		$table = $wpdb->prefix.BTS_TABLE_PREFIX."officers";
-		$wpdb->update(
-			$table,
-			$fields,
-			['id'=>$id_officers]
-		);
+		$wpdb->update($table,$fields,['id'=>$id_officers]);
+		if($wpdb->last_error !== '')
+		{
+			return ['success'=>false, 'message'=>$wpdb->last_error];
+		}
 		
 		return ['success'=>true];
 	}

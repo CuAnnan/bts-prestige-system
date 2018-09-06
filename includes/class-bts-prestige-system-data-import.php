@@ -190,10 +190,10 @@ class Bts_Prestige_System_Data_Import
 	{
 		$memberRecords = self::fetch_members();
 		$keyMap = [];
-                global $wpdb;
-                wp_defer_term_counting( false );
-                wp_defer_comment_counting( false );
-                $wpdb->query( 'SET autocommit = 0;' );
+		global $wpdb;
+		wp_defer_term_counting( false );
+		wp_defer_comment_counting( false );
+		$wpdb->query( 'SET autocommit = 0;' );
 		foreach($memberRecords as $memberRecord)
 		{
 			if($memberRecord['membership_number'])
@@ -204,10 +204,10 @@ class Bts_Prestige_System_Data_Import
 				self::map_user_meta_data($user_id, $memberRecord);
 			}
 		}
-                wp_defer_term_counting( true );
-                wp_defer_comment_counting( true );
-                $wpdb->query( 'SET autocommit = 1;' );
-                $wpdb->query( 'COMMIT;' );
+		wp_defer_term_counting( true );
+		wp_defer_comment_counting( true );
+		$wpdb->query( 'SET autocommit = 1;' );
+		$wpdb->query( 'COMMIT;' );
 		return $keyMap;
 	}
 	

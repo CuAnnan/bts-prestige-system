@@ -128,12 +128,21 @@ class Bts_Prestige_System_Activator {
 				'monthly_cap INT UNSIGNED',
 				'PRIMARY KEY  (id)'
 			],
+			'prestige_actions'=>[
+				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
+				'description varchar(255)',
+				'active tinyint(1)',
+				'value varchar(255)',
+				'id_prestige_category bigint(20) UNSIGNED',
+				'PRIMARY KEY  (id)',
+				"FOREIGN KEY (id_prestige_category) REFERENCES {$prefix}prestige_categories(id)",
+			],
 			'prestige_rewards'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
 				'id_member bigint(20) UNSIGNED NOT NULL',
 				'id_member_approved bigint(20) UNSIGNED',
 				'id_officer_approved bigint(20) UNSIGNED',
-				'id_prestige_category bigint(20) UNSIGNED',
+				'id_prestige_action bigint(20) UNSIGNED',
 				"date_claimed datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 				"date_added datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 				"reward_amount int UNSIGNED NOT NULL",
@@ -141,7 +150,7 @@ class Bts_Prestige_System_Activator {
 				"FOREIGN KEY (id_member) REFERENCES {$wpdb->prefix}users(ID)",
 				"FOREIGN KEY (id_member_approved) REFERENCES {$wpdb->prefix}users(ID)",
 				"FOREIGN KEY (id_officer_approved) REFERENCES {$prefix}officers(ID)",
-				"FOREIGN KEY (id_prestige_category) REFERENCES {$prefix}prestige_categories(id)",
+				"FOREIGN KEY (id_prestige_action) REFERENCES {$prefix}prestige_actions(id)",
 			],
 			'prestige_reward_notes'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',

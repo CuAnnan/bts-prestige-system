@@ -5,6 +5,10 @@
  * As such it ignores best practices regarding method and class lenght.
  * While I could write the SQL statements to take up one line only, that would make them illegible.
  * While I could write them in a separate file each, that is both a more complex solution and a less legible one.
+ * 
+ * 
+ * The basic way that each function works is it takes the old data and imports it into the new database
+ * returning an array mapping old ids to new ids, so that the integrity of the imports can be guaranteed
  */
 
 require_once(BTS_ABS_PATH.'admin/class-bts-prestige-system-offices.php');
@@ -20,8 +24,9 @@ class Bts_Prestige_System_Data_Import
 		list($venueMap, $venuesDomainMap) = self::import_venues($genreMap, $domainMap);
 		$userMap = self::import_users($domainMap);
 		$officerMap = self::import_officers($userMap, $venueMap, $domainMap, $venuesDomainMap);
-		$prestige_categories = self::import_prestige_categories();
-		self::import_prestige($userMap, $officerMap, $prestige_categories);
+		$prestigeCategoryMap = self::import_prestige_categories();
+		$prestigeActionMap = self::import_prestige_actions();
+		self::import_prestige($userMap, $officerMap, $prestigeActionMap);
 	}
 	
 	private static function fetch_prestige_category_records()
@@ -54,6 +59,26 @@ class Bts_Prestige_System_Data_Import
 		return $keyMap;
 	}
 	
+	private static function import_prestige_actions($prestigeCategoryMap)
+	{
+		global $wpdb;
+		$table = $wpdb->prefix.BTS_TABLE_PREFIX."prestige_categories";
+		$action_records = self::fetch_prestige_action_records();
+		$keyMap = [];
+		foreach($action_records as $record)
+		{
+			$wpdb->insert(
+				$table,[
+					'description'=>$record['pacDesc'],
+					'active'=>$record['pacActive'],
+					'value'=>$record['pacValue'],
+					'id_prestige_category'=>$prestigeCategoryMap[$record['pacCategory']]
+			]);
+			$keyMap[$record['pacID']] = $wpdb->insert_id;
+		}
+		return $keyMap;
+	}
+	
 	private static function fetch_prestige_records()
 	{
 		// We're only concerned with importing the approved prestige records
@@ -63,10 +88,13 @@ class Bts_Prestige_System_Data_Import
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 	
-	private static function import_prestige($users, $officers, $prestige_categories)
+	private static function import_prestige($users, $officers, $prestige_actions)
 	{
 		$prestige_records = self::fetch_prestige_records();
-		
+		foreach($prestige_records as $prestige_record)
+		{
+			
+		}
 	}
 	
 	private static function fetch_officer_records()

@@ -131,7 +131,7 @@ class Bts_Prestige_System_Activator {
 			'prestige_actions'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
 				'description varchar(255)',
-				'active tinyint(1)',
+				'active boolean',
 				'value varchar(255)',
 				'id_prestige_category bigint(20) UNSIGNED',
 				'PRIMARY KEY  (id)',
@@ -144,8 +144,8 @@ class Bts_Prestige_System_Activator {
 				'id_officer_approved bigint(20) UNSIGNED',
 				'id_prestige_action bigint(20) UNSIGNED',
 				"date_claimed datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
-				"date_added datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 				"reward_amount int UNSIGNED NOT NULL",
+				'reward_type ENUM("Open", "Regional", "National") DEFAULT "Open"',
 				'PRIMARY KEY  (id)',
 				"FOREIGN KEY (id_member) REFERENCES {$wpdb->prefix}users(ID)",
 				"FOREIGN KEY (id_member_approved) REFERENCES {$wpdb->prefix}users(ID)",
@@ -155,7 +155,7 @@ class Bts_Prestige_System_Activator {
 			'prestige_reward_notes'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
 				'id_prestige_rewards bigint(20) UNSIGNED NOT NULL',
-				'id_users bigint(20) UNSIGNED NOT NULL',
+				'id_users bigint(20) UNSIGNED',
 				'id_officer bigint(20) UNSIGNED',
 				'note varchar(255)',
 				'approved boolean',

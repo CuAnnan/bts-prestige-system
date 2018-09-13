@@ -12,21 +12,62 @@
  */
 
 require_once(BTS_ABS_PATH.'admin/class-bts-prestige-system-offices.php');
+require_once(BTS_ABS_PATH.'admin/class-bts-prestige-system-prestige.php');
 class Bts_Prestige_System_Data_Import
 {
 	private static $pdo = null;
 	
+	public static function startTrans()
+	{
+		global $wpdb;
+		wp_defer_term_counting( false );
+		wp_defer_comment_counting( false );
+		$wpdb->query( 'SET autocommit = 0;' );
+	}
+	
+	public static function endTrans()
+	{
+		global $wpdb;
+		wp_defer_term_counting( true );
+		wp_defer_comment_counting( true );
+		$wpdb->query( 'SET autocommit = 1;' );
+		$wpdb->query( 'COMMIT;' );
+	}
+	
 	public static function import($pdo)
 	{
+		
 		self::$pdo = $pdo;
+		error_log('Importing domains');
 		$domainMap = self::import_domains();
+		error_log('Domains imported');
+		error_log('Importing genres');
 		$genreMap = self::import_genres();
+		error_log('Genres imported');
+		error_log('Importing venues');
 		list($venueMap, $venuesDomainMap) = self::import_venues($genreMap, $domainMap);
+		error_log('Venues imported');
+		error_log('Importing users');
+		
+		self::startTrans();
 		$userMap = self::import_users($domainMap);
+		self::endTrans();
+		
+		error_log('Users imported');
+		error_log('Importing officers');
 		$officerMap = self::import_officers($userMap, $venueMap, $domainMap, $venuesDomainMap);
+		error_log('Officers imported');
+		error_log('Importing prestige categories');
 		$prestigeCategoryMap = self::import_prestige_categories();
-		$prestigeActionMap = self::import_prestige_actions();
+		error_log('Prestige categories imported');
+		error_log('Importing prestige actions');
+		$prestigeActionMap = self::import_prestige_actions($prestigeCategoryMap);
+		error_log('Prestige actions imported');
+		error_log('Importing prestige records');
+		self::startTrans();
 		self::import_prestige($userMap, $officerMap, $prestigeActionMap);
+		self::endTrans();
+		error_log('Prestige records imported');
 	}
 	
 	private static function fetch_prestige_category_records()
@@ -59,10 +100,18 @@ class Bts_Prestige_System_Data_Import
 		return $keyMap;
 	}
 	
+	private static function fetch_prestige_action_records()
+	{
+		$stmt = self::$pdo->prepare("SELECT * FROM prestigeactions");
+		$stmt->execute();
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+	
+	
 	private static function import_prestige_actions($prestigeCategoryMap)
 	{
 		global $wpdb;
-		$table = $wpdb->prefix.BTS_TABLE_PREFIX."prestige_categories";
+		$table = $wpdb->prefix.BTS_TABLE_PREFIX."prestige_actions";
 		$action_records = self::fetch_prestige_action_records();
 		$keyMap = [];
 		foreach($action_records as $record)
@@ -88,12 +137,47 @@ class Bts_Prestige_System_Data_Import
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 	
+	private static function clean_prestige_amount($record)
+	{
+		if($record['prlOpen'])
+		{
+			return[$record['prlOpen'], 'Open'];
+		}
+		else if($record['prlRegional'])
+		{
+			return [$record['prlRegional'], 'Regional'];
+		}
+		else if($record['prlNational'])
+		{
+			return [$record['prlNational'], 'National'];
+		}
+	}
+	
 	private static function import_prestige($users, $officers, $prestige_actions)
 	{
 		$prestige_records = self::fetch_prestige_records();
-		foreach($prestige_records as $prestige_record)
+		
+		foreach($prestige_records as $record)
 		{
 			
+			list($prestigeAmount, $prestigeType) = self::clean_prestige_amount($record);
+			if($prestigeAmount)
+			{
+				$id_prestige_record = Bts_Prestige_System_Prestige::add_prestige_record(
+					$users[$record['fk_mem_prlID']],
+					$users[$record['prlAwardedBy']],
+					$officers[$record['fk_prl_posAwarding']],
+					$prestige_actions[$record['fk_prl_pacID']],
+					$record['prlDate'],
+					$prestigeAmount,
+					$prestigeType,
+					$record['prlReason']
+				);
+				/**
+				 * The old system doesn't store either the id of the officer that audited the log or the id of the user that audited it
+				 */
+				Bts_Prestige_System_Prestige::add_record_note($id_prestige_record, null, $record['prlAuditNote'], $record['prlAuditDate'], true, null);
+			}
 		}
 	}
 	
@@ -239,10 +323,6 @@ class Bts_Prestige_System_Data_Import
 	{
 		$memberRecords = self::fetch_members();
 		$keyMap = [];
-		global $wpdb;
-		wp_defer_term_counting( false );
-		wp_defer_comment_counting( false );
-		$wpdb->query( 'SET autocommit = 0;' );
 		foreach($memberRecords as $memberRecord)
 		{
 			if($memberRecord['membership_number'])
@@ -253,10 +333,6 @@ class Bts_Prestige_System_Data_Import
 				self::map_user_meta_data($user_id, $memberRecord);
 			}
 		}
-		wp_defer_term_counting( true );
-		wp_defer_comment_counting( true );
-		$wpdb->query( 'SET autocommit = 1;' );
-		$wpdb->query( 'COMMIT;' );
 		return $keyMap;
 	}
 	

@@ -81,15 +81,18 @@
 	function updateOffice(evt)
 	{
 		let data = {
-			action:			'update_office',
-			id:				$('#office_edit_id_officers').val(),
-			id_users:		$('#office_edit_id_users').val(),
-			title:			$('#office_edit_office-title').val(),
-			email:			$('#office_edit_email').val(),
-			date_appointed:	$('#office_edit_office-date').val(),
-			id_superior:	$('#office_edit_id_superior').val(),
-			id_domains:		$('#office_edit_id_domains').val(),
-			chain:			$('#office_edit_chain').val()
+			action:				'update_office',
+			id:					$('#office_edit_id_officers').val(),
+			id_users:			$('#office_edit_id_users').val(),
+			title:				$('#office_edit_office-title').val(),
+			email:				$('#office_edit_email').val(),
+			date_appointed:		$('#office_edit_office-date').val(),
+			id_superior:		$('#office_edit_id_superior').val(),
+			id_domains:			$('#office_edit_id_domains').val(),
+			chain:				$('#office_edit_chain').val(),
+			first_name:			$('#office_edit_first_name').val(),
+			last_name:			$('#office_edit_last_name').val(),
+			membership_number:	$('#office_edit_membership_number').val()
 		};
 		
 		$.post(

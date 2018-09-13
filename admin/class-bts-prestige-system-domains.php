@@ -10,7 +10,7 @@ require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-genres.php';
 
 class Bts_Prestige_System_Domains
 {
-	public static function get_managed_domains_for_logged_in_user()
+	public static function get_managed_domains_for_id_users($id_users)
 	{
 		global $wpdb;
 		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
@@ -26,10 +26,15 @@ class Bts_Prestige_System_Domains
 				LEFT JOIN {$prefix}domains d ON (o.id_domains = d.id)
 			WHERE
 					o.id_users = %d
-				AND o.id_genres IS NULL	
+				AND o.id_venues	IS NULL	
 				AND	o.id_superior IS NULL",
-			get_current_user_id()
+			$id_users
 		));
+	}
+	
+	public static function get_managed_domains_for_logged_in_user()
+	{
+		return self::get_managed_domains_for_id_users(get_current_user_id());
 	}
 	
 	public static function get_all_domains()

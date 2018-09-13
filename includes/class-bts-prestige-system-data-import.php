@@ -1,4 +1,13 @@
 <?php
+
+/**
+ * This is an import class. It runs a whole swathe of SQL queries against two databases.
+ * As such it ignores best practices regarding method and class lenght.
+ * While I could write the SQL statements to take up one line only, that would make them illegible.
+ * While I could write them in a separate file each, that is both a more complex solution and a less legible one.
+ */
+
+require_once(BTS_ABS_PATH.'admin/class-bts-prestige-system-offices.php');
 class Bts_Prestige_System_Data_Import
 {
 	private static $pdo = null;
@@ -11,8 +20,8 @@ class Bts_Prestige_System_Data_Import
 		list($venueMap, $venuesDomainMap) = self::import_venues($genreMap, $domainMap);
 		$userMap = self::import_users($domainMap);
 		$officerMap = self::import_officers($userMap, $venueMap, $domainMap, $venuesDomainMap);
-		/*$prestige_categories = self::import_prestige_categories();
-		self::import_prestige($users, $officers, $prestige_categories);*/
+		$prestige_categories = self::import_prestige_categories();
+		self::import_prestige($userMap, $officerMap, $prestige_categories);
 	}
 	
 	private static function fetch_prestige_category_records()
@@ -47,7 +56,9 @@ class Bts_Prestige_System_Data_Import
 	
 	private static function fetch_prestige_records()
 	{
-		$stmt = self::$pdo->prepare('SELECT * FROM prestigelog');
+		// We're only concerned with importing the approved prestige records
+		// because we don't really know what the other prlAudited fields mean
+		$stmt = self::$pdo->prepare('SELECT * FROM prestigelog WHERE prlAudited = 4');
 		$stmt->execute();
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
@@ -82,7 +93,7 @@ class Bts_Prestige_System_Data_Import
 	{
 		global $wpdb;
 		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
-		$table = "{$prefix}officers";
+		$officers_table = "{$prefix}officers";
 		$chain = strpos($officer_record['title'], 'tory') !== FALSE?'Storyteller':'Coordinator';
 		$data = [
 			'title'=>$officer_record['title'],
@@ -93,10 +104,11 @@ class Bts_Prestige_System_Data_Import
 		];
 		if($domain_id){ $data['id_domains'] = $domain_id;}
 		if($venue_id){ $data['id_venues'] = $venue_id;}
+		
 		$idOfficer = null;
 		if($data['id_users'])
 		{
-			$wpdb->insert($table, $data);
+			$wpdb->insert($officers_table, $data);
 			$idOfficer = $wpdb->insert_id;
 		}
 		return $idOfficer;
@@ -105,13 +117,23 @@ class Bts_Prestige_System_Data_Import
 	public static function update_officer_heirarchy($id_officer, $id_superior)
 	{
 		global $wpdb;
-		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
-		$table = "{$prefix}officers";
+		$table = $wpdb->prefix.BTS_TABLE_PREFIX."officers";
 		$wpdb->update(
 			$table,
 			['id_superior'=>$id_superior],
 			['id'=>$id_officer]
 		);
+	}
+	
+	private static function update_officer_roles()
+	{
+		global $wpdb;
+		$table = $wpdb->prefix.BTS_TABLE_PREFIX."officers";
+		$domain_coordinator_records = $wpdb->get_results("SELECT id_users, id_domains FROM $table WHERE id_domains IS NOT NULL AND id_superior IS NULL AND chain = 'Coordinator'");
+		foreach($domain_coordinator_records as $domain_coordinator_record)
+		{
+			Bts_Prestige_System_Offices::add_domain_coordinator_role($domain_coordinator_record->id_users);
+		}
 	}
 	
 	private static function import_officers($users, $venues, $domains, $venueDomainsMap)
@@ -133,10 +155,9 @@ class Bts_Prestige_System_Data_Import
 		}
 		foreach($subordinates as $id_officer=>$old_id_superior)
 		{
-			$id_superior = $keyMap[$old_id_superior];
-			self::update_officer_heirarchy($id_officer, $id_superior);
+			self::update_officer_heirarchy($id_officer, $keyMap[$old_id_superior]);
 		}
-		
+		self::update_officer_roles();
 		return $keyMap;
 	}
 	

@@ -76,8 +76,7 @@ class Bts_Prestige_System_Admin {
 		 */
 		wp_register_style('prefix_bootstrap', '//stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css');
 		wp_enqueue_style('prefix_bootstrap');
-		wp_enqueue_style( $this->plugin_name.'autocomplete', plugin_dir_url( __FILE__ ) . 'css/bts-prestige-system-admin.css', array(), $this->version, 'all' );
-		wp_enqueue_style( $this->plugin_name.'admin', plugin_dir_url( __FILE__ ) . 'css/easy-autocomplete.min.css', array(), $this->version, 'all');
+		
 	}
 
 	/**
@@ -101,20 +100,14 @@ class Bts_Prestige_System_Admin {
 		
 		wp_register_script('prefix_bootstrap', '//stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js');
 		wp_enqueue_script('prefix_bootstrap');
-		wp_enqueue_script( $this->plugin_name.'autocomplete', plugin_dir_url( __FILE__ ) . 'js/jquery.easy-autocomplete.min.js', array( 'jquery' ), $this->version, false );
-		wp_enqueue_script( $this->plugin_name.'admin', plugin_dir_url( __FILE__ ) . 'js/bts-prestige-system-admin.js', array( 'jquery' ), $this->version, false );
 	}
 	
 	public function manage_club_structure()
 	{
-		if(!current_user_can('manage_club_structure') && !$this->user_is_admin())
-		{
-			return;
-		}
 		add_menu_page(
 			'Club Structure',
 			'Manage Club Structure',
-			'manage_club_structure',
+			BTS_MANAGE_CLUB_STRUCTURE_ROLE,
 			'bts_manage_club_structure',
 			array($this, 'manage_club_structure_page')
 		);
@@ -130,11 +123,11 @@ class Bts_Prestige_System_Admin {
 	 */
 	public function manage_club_structure_page()
 	{
+		wp_enqueue_style( $this->plugin_name.'autocomplete', plugin_dir_url( __FILE__ ) . 'css/bts-prestige-system-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name.'admin', plugin_dir_url( __FILE__ ) . 'css/easy-autocomplete.min.css', array(), $this->version, 'all');
+		wp_enqueue_script( $this->plugin_name.'autocomplete', plugin_dir_url( __FILE__ ) . 'js/jquery.easy-autocomplete.min.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name.'admin', plugin_dir_url( __FILE__ ) . 'js/bts-prestige-system-admin.js', array( 'jquery' ), $this->version, false );
 		
-		if(!$this->user_is_admin() && !current_user_can('manage_club_structure'))
-		{
-			wp_die('This is not permitted for your account');
-		}
 		Bts_Prestige_System_Domains::show_domain_management_page();
 	}
 	

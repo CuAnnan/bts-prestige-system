@@ -35,7 +35,17 @@ class Bts_Prestige_System_Activator {
 		self::buildDatabaseTables();
 		require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-data-import.php';
 		Bts_Prestige_System_Data_Import::import(new PDO('mysql:host=localhost;dbname=camaus2', 'old_db_dba'));
+		
 	}
+	
+	public static function add_custom_capabilities()
+	{
+		$role = add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
+		$role->add_cap(BTS_MANAGE_CLUB_STRUCTURE_PERM);
+		$admin_role = get_role('administrator');
+		$admin_role->add_cap(BTS_MANAGE_CLUB_STRUCTURE_PERM);
+	}
+	
 	
 	/**
 	 * Short Description. A method to build the databases used by the system.
@@ -161,6 +171,18 @@ class Bts_Prestige_System_Activator {
 		$wpdb->query("DELETE FROM {$wpdb->prefix}usermeta WHERE user_id > 1");
 		$wpdb->query("DELETE FROM {$wpdb->prefix}users WHERE ID > 1");
 		$wpdb->query("ALTER TABLE {$wpdb->prefix}users AUTO_INCREMENT = 2;");
+		self::remove_custom_capabilities();
+	}
+	
+	public static function remove_custom_capabilities()
+	{
+		global $wp_roles;
+		foreach (array_keys($wp_roles->roles) as $role)
+		{
+			$wp_roles->remove_cap($role, BTS_MANAGE_CLUB_STRUCTURE_ROLE);
+		}
+		remove_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
+		
 	}
 
 }

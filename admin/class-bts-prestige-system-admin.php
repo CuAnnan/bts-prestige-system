@@ -1,6 +1,7 @@
 <?php
 require_once plugin_dir_path( __FILE__ ).'class-bts-prestige-system-domains.php';
 require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-offices.php';
+require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-prestige.php';
 
 /**
  * The admin-specific functionality of the plugin.
@@ -129,6 +130,25 @@ class Bts_Prestige_System_Admin {
 		wp_enqueue_script( $this->plugin_name.'admin', plugin_dir_url( __FILE__ ) . 'js/bts-prestige-system-admin.js', array( 'jquery' ), $this->version, false );
 		
 		Bts_Prestige_System_Domains::show_domain_management_page();
+	}
+	
+	public function manage_prestige()
+	{
+		add_menu_page(
+			'Prestige',
+			'Prestige',
+			'read',
+			'bts_manage_prestige',
+			array($this, 'manage_prestige_page')
+		);
+	}
+	
+	public function manage_prestige_page()
+	{
+		wp_enqueue_style($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css', array(), $this->version, 'all');
+		wp_enqueue_script($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name.'prestige_management', plugin_dir_url(__FILE__).'js/prestige_management.js', array('jquery'), $this->version, false);
+		Bts_Prestige_System_Prestige::show_prestige_management_page();
 	}
 	
 	public function update_office()

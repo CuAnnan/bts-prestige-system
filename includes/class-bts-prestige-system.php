@@ -157,6 +157,7 @@ class Bts_Prestige_System {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu',			$plugin_admin, 'manage_club_structure');
+		$this->loader->add_action( 'admin_menu',			$plugin_admin, 'manage_prestige');
 		$this->loader->add_action( 'wp_ajax_update_office',	$plugin_admin, 'update_office');
 	}
 

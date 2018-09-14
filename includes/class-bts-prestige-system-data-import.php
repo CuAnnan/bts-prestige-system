@@ -163,20 +163,29 @@ class Bts_Prestige_System_Data_Import
 			list($prestigeAmount, $prestigeType) = self::clean_prestige_amount($record);
 			if($prestigeAmount)
 			{
-				$id_prestige_record = Bts_Prestige_System_Prestige::add_prestige_record(
-					$users[$record['fk_mem_prlID']],
-					$users[$record['prlAwardedBy']],
-					$officers[$record['fk_prl_posAwarding']],
-					$prestige_actions[$record['fk_prl_pacID']],
-					$record['prlDate'],
-					$prestigeAmount,
-					$prestigeType,
-					$record['prlReason']
-				);
-				/**
-				 * The old system doesn't store either the id of the officer that audited the log or the id of the user that audited it
-				 */
-				Bts_Prestige_System_Prestige::add_record_note($id_prestige_record, null, $record['prlAuditNote'], $record['prlAuditDate'], true, null);
+				$id_users = $users[$record['fk_mem_prlID']];
+				
+				if($id_users)
+				{
+					$id_prestige_record = Bts_Prestige_System_Prestige::add_prestige_record(
+						$id_users,
+						$users[$record['prlAwardedBy']],
+						$officers[$record['fk_prl_posAwarding']],
+						$prestige_actions[$record['fk_prl_pacID']],
+						$record['prlDate'],
+						$prestigeAmount,
+						$prestigeType,
+						$record['prlReason']
+					);
+					/**
+					 * The old system doesn't store either the id of the officer that audited the log or the id of the user that audited it
+					 */
+					Bts_Prestige_System_Prestige::add_record_note($id_prestige_record, null, $record['prlAuditNote'], $record['prlAuditDate'], true, null);
+				}
+				else
+				{
+					error_log($record['fk_mem_prlID'].' not mapped.');
+				}
 			}
 		}
 	}

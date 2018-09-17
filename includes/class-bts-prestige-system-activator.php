@@ -33,14 +33,19 @@ class Bts_Prestige_System_Activator {
 	public static function activate()
 	{
 		self::buildDatabaseTables();
+		self::import_old_cam_database();
+		self::add_custom_capabilities();
+	}
+	
+	public static function import_old_cam_database()
+	{
 		require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-data-import.php';
 		Bts_Prestige_System_Data_Import::import(new PDO('mysql:host=localhost;dbname=camaus2', 'old_db_dba'));
-		
 	}
 	
 	public static function add_custom_capabilities()
 	{
-		$role = add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
+		$role = add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE, 'Club management');
 		$role->add_cap(BTS_MANAGE_CLUB_STRUCTURE_PERM);
 		$admin_role = get_role('administrator');
 		$admin_role->add_cap(BTS_MANAGE_CLUB_STRUCTURE_PERM);
@@ -143,6 +148,8 @@ class Bts_Prestige_System_Activator {
 				'id_member_approved bigint(20) UNSIGNED',
 				'id_officer_approved bigint(20) UNSIGNED',
 				'id_prestige_action bigint(20) UNSIGNED',
+				"id_domains bigint(20) UNSIGNED",
+				"id_venues bigint(20) UNSIGNED",
 				"date_claimed datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 				"reward_amount int UNSIGNED NOT NULL",
 				'reward_type ENUM("Open", "Regional", "National") DEFAULT "Open"',
@@ -151,6 +158,8 @@ class Bts_Prestige_System_Activator {
 				"FOREIGN KEY (id_member_approved) REFERENCES {$wpdb->prefix}users(ID)",
 				"FOREIGN KEY (id_officer_approved) REFERENCES {$prefix}officers(ID)",
 				"FOREIGN KEY (id_prestige_action) REFERENCES {$prefix}prestige_actions(id)",
+				"FOREIGN KEY (id_domains) REFERENCES {$prefix}domains(id)",
+				"FOREIGN KEY (id_venues) REFERENCES {$prefix}venues(id)"
 			],
 			'prestige_reward_notes'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
@@ -168,7 +177,7 @@ class Bts_Prestige_System_Activator {
 		];
 	}
 	
-	public static function deactivate()
+	public static function remove_plugin_database_tables()
 	{
 		global $wpdb;
 		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
@@ -180,6 +189,11 @@ class Bts_Prestige_System_Activator {
 		$wpdb->query("DELETE FROM {$wpdb->prefix}usermeta WHERE user_id > 1");
 		$wpdb->query("DELETE FROM {$wpdb->prefix}users WHERE ID > 1");
 		$wpdb->query("ALTER TABLE {$wpdb->prefix}users AUTO_INCREMENT = 2;");
+	}
+	
+	public static function deactivate()
+	{
+		self::remove_plugin_database_tables();
 		self::remove_custom_capabilities();
 	}
 	

@@ -31,6 +31,18 @@ class Bts_Prestige_System_Prestige
 		return $id_prestige_record;
 	}
 	
+	public static function try_to_add_record_note($id_prestige_record, $note_text, $approved)
+	{
+		$id_users = get_current_user_id();
+		$now = date("Y-m-d H:i:s");
+		$id_officer = null;
+		if($approved)
+		{
+			// check that the user can in fact approve the record
+		}
+		return self::add_record_note($id_prestige_record, $id_users, $note_text, $now, $approved, $id_officer);
+	}
+	
 	public static function add_record_note($id_prestige_record, $id_users, $note_text, $date_note_added, $approved = false, $id_officer = null)
 	{
 		global $wpdb;
@@ -48,6 +60,11 @@ class Bts_Prestige_System_Prestige
 			$record['id_officer']=$id_officer;
 		}
 		$wpdb->insert($table,$record);
+		if($wpdb->insert_id)
+		{
+			return ['success'=>true];
+		}
+		return ['success'=>false, 'message'=>$wpdb->last_error];
 	}
 	
 	
@@ -60,12 +77,13 @@ class Bts_Prestige_System_Prestige
 		{
 			$ordered_record->$basic_field = $record->$basic_field;
 		}
+		$ordered_record->approved = "Approved";
 		return $ordered_record;
 	}
 	
 	public static function cooerce_record_to_note_object($record)
 	{
-		$note_fields = ["note", "note_officer_title", "note_domain_name", "note_genre_name"];
+		$note_fields = ["note", "note_officer_title", "note_domain_name", "note_genre_name", "approved", "note_date"];
 		$note_object = new stdClass();
 		foreach($note_fields as $note_field)
 		{
@@ -93,6 +111,7 @@ class Bts_Prestige_System_Prestige
 				pn.id					AS note_id,
 				pn.note					AS note,
 				pn.approved				AS approved,
+				pn.date					AS note_date,
 				n_o.title				AS note_officer_title,
 				dn.name					AS note_domain_name,
 				dg.name					AS note_genre_name
@@ -119,7 +138,6 @@ class Bts_Prestige_System_Prestige
 				pn.id			ASC
 			",
 			$id_users);
-			//191);
 		
 		$prestige_records = $wpdb->get_results($qry);
 		$prestige_rewards = [];
@@ -131,7 +149,10 @@ class Bts_Prestige_System_Prestige
 			{
 				$prestige_rewards[$prestige_record->id] = self::cooerce_record_to_object($prestige_record);
 			}
-			$prestige_rewards[$prestige_record->id]->approved = $prestige_record->approved?'Approved':'Not approved';
+			if($prestige_rewards[$prestige_record->id]->approved && !$prestige_record->approved && $prestige_record->note_officer_title)
+			{
+				$prestige_rewards[$prestige_record->id]->approved = ($prestige_record->approved)?'Approved':'Not approved';
+			}
 			$prestige_rewards[$prestige_record->id]->notes[] = self::cooerce_record_to_note_object($prestige_record);
 		}
 		return $prestige_rewards;

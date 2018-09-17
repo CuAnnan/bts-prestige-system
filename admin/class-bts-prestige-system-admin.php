@@ -138,17 +138,28 @@ class Bts_Prestige_System_Admin {
 			'Prestige',
 			'Prestige',
 			'read',
-			'bts_manage_prestige',
-			array($this, 'manage_prestige_page')
+			'bts_prestige_log',
+			array($this, 'show_prestige_log')
 		);
 	}
 	
-	public function manage_prestige_page()
+	public function show_prestige_log()
 	{
 		wp_enqueue_style($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css', array(), $this->version, 'all');
 		wp_enqueue_script($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js', array('jquery'), $this->version, false);
 		wp_enqueue_script($this->plugin_name.'prestige_management', plugin_dir_url(__FILE__).'js/prestige_management.js', array('jquery'), $this->version, false);
 		Bts_Prestige_System_Prestige::show_prestige_management_page();
+	}
+	
+	public function add_prestige_note()
+	{
+		header("Content-type: text/json");
+		echo json_encode(Bts_Prestige_System_Prestige::try_to_add_record_note(
+			filter_input(INPUT_POST, 'id_prestige_record'),
+			filter_input(INPUT_POST, 'note_text'),
+			filter_input(INPUT_POST, 'approved')
+		));
+		exit();
 	}
 	
 	public function update_office()

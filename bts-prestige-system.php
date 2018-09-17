@@ -39,6 +39,7 @@ define('PLUGIN_NAME_VERSION', '1.0.0');
 
 define('BTS_TABLE_PREFIX', 'bts_');
 define('BTS_MANAGE_CLUB_STRUCTURE_ROLE', 'club_manager');
+define('BTS_MANAGE_CLUB_STRUCTURE_PERM', 'club_management');
 define('BTS_ABS_PATH', plugin_dir_path(__FILE__));
 
 /**

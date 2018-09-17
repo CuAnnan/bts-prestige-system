@@ -155,6 +155,12 @@ class Bts_Prestige_System_Data_Import
 	
 	private static function import_prestige($users, $officers, $prestige_actions)
 	{
+		global $wpdb;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+		$id_legacy_nrc = $wpdb->get_var(
+			"SELECT id FROM {$prefix}officers WHERE title = 'Legacy NRC officer'"
+		);
+		
 		$prestige_records = self::fetch_prestige_records();
 		
 		foreach($prestige_records as $record)
@@ -180,7 +186,7 @@ class Bts_Prestige_System_Data_Import
 					/**
 					 * The old system doesn't store either the id of the officer that audited the log or the id of the user that audited it
 					 */
-					Bts_Prestige_System_Prestige::add_record_note($id_prestige_record, null, $record['prlAuditNote'], $record['prlAuditDate'], true, null);
+					Bts_Prestige_System_Prestige::add_record_note($id_prestige_record, null, $record['prlAuditNote'], $record['prlAuditDate'], true, $id_legacy_nrc);
 				}
 				else
 				{
@@ -274,6 +280,17 @@ class Bts_Prestige_System_Data_Import
 				$subordinates[$new_id] = $officer_record['old_id_superior'];
 			}
 		}
+		
+		self::add_officer(
+			[
+				'title'=>'Legacy NRC officer',
+				'email'=>null,
+				'date_appointed'=>date("Y-m-d H:i:s")
+			],
+			1,
+			null,
+			null
+		);
 		foreach($subordinates as $id_officer=>$old_id_superior)
 		{
 			self::update_officer_heirarchy($id_officer, $keyMap[$old_id_superior]);

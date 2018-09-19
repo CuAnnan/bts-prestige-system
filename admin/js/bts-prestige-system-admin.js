@@ -16,7 +16,6 @@
 		$editOfficeModal = $('#editOfficeModal');
 		bindEventHandlers();
 		setUpAutoComplete();
-		
 	});
 	
 	function bindEventHandlers()
@@ -24,6 +23,19 @@
 		// event handlers
 		$('.btn_edit_office').click(editOffice);
 		$('#updateModalButton').click(updateOffice);
+		$('#reset_permissions_button').click(resetPermissions);
+	}
+	
+	function resetPermissions()
+	{
+		$.post(
+			ajaxurl,
+			{action:'reset_permissions'},
+			function(response)
+			{
+				console.log(response);
+			}
+		);
 	}
 	
 	function setUpAutoComplete()

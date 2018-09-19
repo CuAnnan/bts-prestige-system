@@ -1,5 +1,6 @@
 <?php
 require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-domains.php';
+require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-venues.php';
 
 class Bts_Prestige_System_Offices
 {
@@ -101,7 +102,7 @@ class Bts_Prestige_System_Offices
 	 * Therefore, if an officer has more than one office, we don't remove their 
 	 * privilege. But if they have only one, we remove their privilege.
 	 */
-	public static function remove_officer_role($id_users)
+	public static function remove_manage_club_structure_role($id_users)
 	{
 		$offices = Bts_Prestige_System_Domains::get_managed_domains_for_id_users($id_users);
 		$office_count = count($offices);
@@ -112,12 +113,39 @@ class Bts_Prestige_System_Offices
 			$user->remove_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
 			$user->remove_cap(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
 		}
+		
+		self::remove_prestige_management_role($id_users, $office_count - 1);
+	}
+	
+	public static function remove_prestige_management_role($id_users, $domains_managed = 0)
+	{
+		if($domains_managed)
+		{
+			return;
+		}
+		
+		$offices = Bts_Prestige_System_Venues::get_managed_venues_for_id_users($id_users);
+		$office_count = count($offices);
+		
+		if($office_count == 1)
+		{
+			$user = new WP_User($id_users);
+			$user->remove_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
+			$user->remove_cap(BTS_PRESTIGE_MANAGEMENT_ROLE);
+		}
 	}
 	
 	public static function add_domain_coordinator_role($id_users)
 	{
 		$user = new WP_User($id_users);
 		$user->add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
+		$user->add_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
+	}
+	
+	public static function add_venue_coordinator_role($id_users)
+	{
+		$user = new WP_User($id_users);
+		$user->add_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
 	}
 	
 	public static function get_domain_coordinator_user_id($id_domains)
@@ -138,23 +166,44 @@ class Bts_Prestige_System_Offices
 			", 
 			$id_domains);
 		return $wpdb->get_row($sql_string);
-		
 	}
 	
-	public static function check_domain_coordinator_permissions($id_domains, $id_officers, $id_users)
+	public static function check_domain_coordinator_permissions($domain_coordinator, $id_users)
 	{
-		$domain_coordinator = self::get_domain_coordinator_user_id($id_domains);
-		
-		if($id_officers === $domain_coordinator->id)
+		if($domain_coordinator->id_users !== $id_users)
 		{
-			$old_officer_id_users = $domain_coordinator->id_users;
-
-			if($old_officer_id_users !== $id_users)
-			{
-				self::remove_officer_role($old_officer_id_users);
-				self::add_domain_coordinator_role($id_users);
-			}
+			self::remove_manage_club_structure_role($domain_coordinator->id_users);
+			self::add_domain_coordinator_role($id_users);
 		}
+	}
+	
+	public static function check_venue_coordinator_permissions($office, $id_users)
+	{
+		if($office->id_users !== $id_users)
+		{
+			self::remove_prestige_management_role($id_users);
+			self::add_venue_coordinator_role($id_users);
+		}
+	}
+	
+	public static function add_office_positions($officer)
+	{
+		$officer->isVC = $officer->chain == 'Coordinator' && $officer->id_superior == null && $officer->id_venues != null;
+		$officer->isDC = $officer->chain == 'Coordinator' && $officer->id_superior == null && $officer->id_venues == null;
+	}
+	
+	public static function get_officer_by_id($id_officers)
+	{
+		global $wpdb;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+		$officer = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT id_domains, id_venues, id_superior, id_users, chain FROM {$prefix}officers WHERE id = %d",
+				$id_officers
+			)
+		);
+		self::add_office_positions($officer);
+		return $officer;
 	}
 	
 	/**
@@ -166,8 +215,16 @@ class Bts_Prestige_System_Offices
 		{
 			return;
 		}
+		$office = self::get_office_by_id($id_officers);
+		if($office->isDC)
+		{
+			self::check_domain_coordinator_permissions($office, $id_users);
+		}
+		else if($office->isVC)
+		{
+			self::check_venue_coordinator_permissions($office, $id_users);
+		}
 		
-		self::check_domain_coordinator_permissions($id_domains, $id_officers, $id_users, $ignore_check);
 	}
 	
 	public static function update_office($id_domains, $id_officers, $fields)
@@ -189,6 +246,73 @@ class Bts_Prestige_System_Offices
 			return ['success'=>false, 'message'=>$wpdb->last_error];
 		}
 		
+		return ['success'=>true];
+	}
+	
+	/*
+	 * This is distinct from all national positions.
+	 * A top level position is an officer who does not answer directly to someone
+	 * else in their specific chain's internal heirarchy
+	 */
+	public static function get_all_top_level_positions()
+	{
+		global $wpdb;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+		return $wpdb->get_results(
+			"SELECT 
+				o.id, o.title, o.id_domains, o.id_venues, o.id_users, o.chain, v.name AS venue
+			FROM 
+							{$prefix}officers o
+				LEFT JOIN	{$prefix}venues v ON(o.id_venues = v.id)
+			WHERE 
+				id_superior IS NULL 
+				AND (v.id IS NULL OR v.active = 1)
+				AND o.id_domains IS NOT NULL"
+		);
+	}
+	
+	public static function remove_all_office_permissions()
+	{
+		$roles = [BTS_MANAGE_CLUB_STRUCTURE_ROLE, BTS_PRESTIGE_MANAGEMENT_ROLE];
+		$users_with_roles = get_users([
+			'role__in'=>$roles
+		]);
+		
+		foreach($users_with_roles as $user)
+		{
+			foreach($roles as $role)
+			{
+				$user->remove_role($role);
+				$user->remove_cap($role);
+			}
+		}
+	}
+	
+	public static function update_office_roles()
+	{
+		$user = wp_get_current_user();
+		$roles = (array) $user->roles;
+		if(!in_array(BTS_MANAGE_CLUB_STRUCTURE_ROLE, $roles))
+		{
+			return ['success'=>false, 'reason'=>'Not permitted'];
+		}
+		
+		self::remove_all_office_permissions();
+		$results = [];
+		$offices = self::get_all_top_level_positions();
+		self::add_domain_coordinator_role(1);
+		foreach($offices as $office)
+		{
+			self::add_office_positions($office);
+			if($office->isDC)
+			{
+				self::add_domain_coordinator_role($office->id_users);
+			}
+			else if($office->isVC)
+			{
+				self::add_venue_coordinator_role($office->id_users);
+			}
+		}
 		return ['success'=>true];
 	}
 	

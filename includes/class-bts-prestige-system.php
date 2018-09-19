@@ -160,6 +160,7 @@ class Bts_Prestige_System {
 		$this->loader->add_action( 'admin_menu',				$plugin_admin, 'manage_prestige');
 		$this->loader->add_action( 'wp_ajax_update_office',		$plugin_admin, 'update_office');
 		$this->loader->add_action( 'wp_ajax_add_prestige_note', $plugin_admin, 'add_prestige_note');
+		$this->loader->add_action( 'wp_ajax_reset_permissions',	$plugin_admin, 'reset_permissions');
 	}
 
 	/**

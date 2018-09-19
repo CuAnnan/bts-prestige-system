@@ -256,11 +256,19 @@ class Bts_Prestige_System_Data_Import
 	{
 		global $wpdb;
 		$table = $wpdb->prefix.BTS_TABLE_PREFIX."officers";
-		$domain_coordinator_records = $wpdb->get_results("SELECT id_users, id_domains FROM $table WHERE id_domains IS NOT NULL AND id_superior IS NULL AND chain = 'Coordinator'");
+		$coordinator_records = $wpdb->get_results("SELECT id_users, id_domains, id_venues FROM $table WHERE id_domains IS NOT NULL AND id_superior IS NULL AND chain = 'Coordinator'");
 		foreach($domain_coordinator_records as $domain_coordinator_record)
 		{
-			Bts_Prestige_System_Offices::add_domain_coordinator_role($domain_coordinator_record->id_users);
+			if($domain_coordinator_record->id_venues)
+			{
+				Bts_Prestige_System_Offices::add_venue_coordinator_role($domain_coordinator_record->id_users);
+			}
+			else
+			{
+				Bts_Prestige_System_Offices::add_domain_coordinator_role($domain_coordinator_record->id_users);
+			}
 		}
+		
 	}
 	
 	private static function import_officers($users, $venues, $domains, $venueDomainsMap)

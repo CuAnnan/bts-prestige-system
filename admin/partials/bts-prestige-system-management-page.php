@@ -72,6 +72,8 @@ echo '<script type="text/json" id="officerHeirarchy">'.json_encode($officers).'<
 		}
 	?>
 	</table>
+	
+	<button class="btn btn-primary" id="reset_permissions_button">Reset all permissions</button>
 
 <div class="modal" id="editOfficeModal" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-dialog-centered" role="document">

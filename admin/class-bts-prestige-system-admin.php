@@ -173,5 +173,11 @@ class Bts_Prestige_System_Admin {
 		exit();
 	}
 	
+	public function reset_permissions()
+	{
+		header("Content-type: text/json");
+		echo json_encode(Bts_Prestige_System_Offices::update_office_roles());
+		exit();
+	}
 	
 }

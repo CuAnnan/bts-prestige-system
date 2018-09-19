@@ -45,10 +45,15 @@ class Bts_Prestige_System_Activator {
 	
 	public static function add_custom_capabilities()
 	{
-		$role = add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE, 'Club management');
-		$role->add_cap(BTS_MANAGE_CLUB_STRUCTURE_PERM);
+		$club_management_role = add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE, 'Club management');
+		$club_management_role->add_cap(BTS_MANAGE_CLUB_STRUCTURE_PERM);
+		
+		$prestige_role = add_role(BTS_PRESTIGE_MANAGEMENT_ROLE, 'Prestige Management');
+		$prestige_role->add_cap(BTS_PESTIGE_MANAGEMENT_PERM);
+		
 		$admin_role = get_role('administrator');
 		$admin_role->add_cap(BTS_MANAGE_CLUB_STRUCTURE_PERM);
+		$admin_role->add_cap(BTS_PRESTIGE_MANAGEMENT_PERM);
 	}
 	
 	
@@ -202,9 +207,11 @@ class Bts_Prestige_System_Activator {
 		global $wp_roles;
 		foreach (array_keys($wp_roles->roles) as $role)
 		{
-			$wp_roles->remove_cap($role, BTS_MANAGE_CLUB_STRUCTURE_ROLE);
+			$wp_roles->remove_cap($role, BTS_MANAGE_CLUB_STRUCTURE_PERM);
+			$wp_roles->remove_cap($role, BTS_PRESTIGE_MANAGEMENT_PERM);
 		}
 		remove_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
+		remove_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
 		
 	}
 

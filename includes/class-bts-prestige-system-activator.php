@@ -33,7 +33,7 @@ class Bts_Prestige_System_Activator {
 	public static function activate()
 	{
 		self::buildDatabaseTables();
-		self::import_old_cam_database();
+		//self::import_old_cam_database();
 		self::add_custom_capabilities();
 	}
 	

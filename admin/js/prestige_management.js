@@ -126,6 +126,7 @@
 							genre_name:genreName,
 							approved:'Not approved'
 						}).draw();
+					$prestigeModal.modal('hide');
 				}
 			}
 		);

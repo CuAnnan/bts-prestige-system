@@ -215,7 +215,7 @@ class Bts_Prestige_System_Offices
 		{
 			return;
 		}
-		$office = self::get_office_by_id($id_officers);
+		$office = self::get_officer_by_id($id_officers);
 		if($office->isDC)
 		{
 			self::check_domain_coordinator_permissions($office, $id_users);

@@ -178,6 +178,21 @@ class Bts_Prestige_System_Admin {
 		exit();
 	}
 	
+	public function add_prestige_record()
+	{
+		header("Content-type: text/json");
+		// signature of the method
+		
+		echo json_encode(Bts_Prestige_System_Prestige::add_prestige_claim(
+			filter_input(INPUT_POST, 'id_officers'),
+			filter_input(INPUT_POST, 'id_prestige_actions'),
+			filter_input(INPUT_POST, 'prestige_amount'),
+			filter_input(INPUT_POST, 'prestige_type'),
+			filter_input(INPUT_POST, 'reason')
+		));
+		exit();
+	}
+	
 	public function update_office()
 	{
 		header("Content-type: text/json");

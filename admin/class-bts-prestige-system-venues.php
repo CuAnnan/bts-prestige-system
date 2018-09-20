@@ -7,21 +7,46 @@ class Bts_Prestige_System_Venues
 		global $wpdb;
 		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		
-		return $wpdb->get_results($wpdb->prepare("SELECT
+		return $wpdb->get_results($wpdb->prepare("
+			SELECT
 				v.id				AS id,
 				v.name				AS name,
 				v.nmc_code			AS nmc_code,
 				g.name				AS genre,
-				d.name				AS domain_name
+                g.id				AS id_genres,
+				d.name				AS domain_name,
+                d.id				AS id_domains
 			FROM
 				{$prefix}venues v
-				LEFT JOIN {$prefix}domains d	ON (o.id_domains = d.id)
-				LEFT JOIN {$prefix}genres g		ON (o.id_genres = g.id)
+				LEFT JOIN {$prefix}officers o	ON (v.id = o.id_venues)
+				LEFT JOIN {$prefix}domains d	ON (v.id_domains = d.id)
+				LEFT JOIN {$prefix}genres g		ON (v.id_genres = g.id)
 			WHERE
 					o.id_users = %d
-				AND o.id_venues	IS NOT NULL	
-				AND	o.id_superior IS NULL",
+				AND	v.id_domains IS NOT NULL",
 			$id_users
 		));
+	}
+	
+	public static function get_all_active_venues()
+	{
+		global $wpdb;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+		return $wpdb->get_results("
+			SELECT
+				v.id				AS id,
+				v.name				AS name,
+				v.nmc_code			AS nmc_code,
+				g.name				AS genre,
+                g.id				AS id_genres,
+				d.name				AS domain_name,
+                d.id				AS id_domains
+			FROM
+				{$prefix}venues v
+				LEFT JOIN {$prefix}domains d	ON (v.id_domains = d.id)
+				LEFT JOIN {$prefix}genres g	ON (v.id_genres = g.id)
+			WHERE
+						v.id_domains IS NOT NULL
+				AND		v.active = 1");
 	}
 }

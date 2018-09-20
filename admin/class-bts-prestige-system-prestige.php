@@ -7,6 +7,26 @@
  */
 class Bts_Prestige_System_Prestige
 {
+	public static function add_prestige_claim($id_officers, $id_prestige_action, $reward_amount, $reward_type, $reason)
+	{
+		$now = date('Y:m:d H:i:s');
+		$id_record = self::add_prestige_record(
+				get_current_user_id(),
+				null,
+				$id_officers,
+				$id_prestige_action,
+				$now,
+				$reward_amount,
+				$reward_type,
+				$reason
+		);
+		if($id_record)
+		{
+			return ['success'=>true, "id_record"=>$id_record, 'date'=>$now];
+		}
+		return ['success'=>false];
+	}
+	
 	public static function add_prestige_record($id_users, $id_member_approved, $id_officer_approved, $id_prestige_action, $date_claimed, $reward_amount, $reward_type, $reason = null)
 	{
 		global $wpdb;
@@ -77,7 +97,7 @@ class Bts_Prestige_System_Prestige
 		{
 			$ordered_record->$basic_field = $record->$basic_field;
 		}
-		$ordered_record->approved = "Approved";
+		$ordered_record->approved = "Not approved";
 		return $ordered_record;
 	}
 	
@@ -149,7 +169,7 @@ class Bts_Prestige_System_Prestige
 			{
 				$prestige_rewards[$prestige_record->id] = self::cooerce_record_to_object($prestige_record);
 			}
-			if($prestige_rewards[$prestige_record->id]->approved && !$prestige_record->approved && $prestige_record->note_officer_title)
+			if($prestige_record->approved && $prestige_record->note_officer_title)
 			{
 				$prestige_rewards[$prestige_record->id]->approved = ($prestige_record->approved)?'Approved':'Not approved';
 			}
@@ -158,9 +178,35 @@ class Bts_Prestige_System_Prestige
 		return $prestige_rewards;
 	}
 	
+	public static function get_prestige_categories()
+	{
+		global $wpdb;
+		$table = $wpdb->prefix.BTS_TABLE_PREFIX."prestige_categories";
+		return $wpdb->get_results("SELECT * FROM {$table} ORDER BY id");
+	}
+	
+	public static function get_prestige_actions()
+	{
+		global $wpdb;
+		$table = $wpdb->prefix.BTS_TABLE_PREFIX."prestige_actions";
+		$sql = "SELECT * FROM {$table} ORDER BY id";
+		return $wpdb->get_results($sql);
+	}
+	
 	public static function show_prestige_management_page()
 	{
-		$prestige_rewards = self::get_prestige_for_user_by_id(get_current_user_id());
+		require_once (plugin_dir_path(__FILE__).'class-bts-prestige-system-domains.php');
+		require_once (plugin_dir_path(__FILE__).'class-bts-prestige-system-offices.php');
+		
+		
+		$prestige_rewards		= self::get_prestige_for_user_by_id(get_current_user_id());
+		$prestige_categories	= self::get_prestige_categories();
+		$prestige_actions		= self::get_prestige_actions();
+		$domains				= Bts_Prestige_System_Domains::get_all_domains();
+		$offices				= Bts_Prestige_System_Offices::get_all_active_offices();
+		$venues					= Bts_Prestige_System_Venues::get_all_active_venues();
+		$viewing_own_log		= true;
+		
 		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-management-page.php');
 	}
 	

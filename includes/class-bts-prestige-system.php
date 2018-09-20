@@ -154,14 +154,16 @@ class Bts_Prestige_System {
 
 		$plugin_admin = new Bts_Prestige_System_Admin( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'admin_enqueue_scripts',		$plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts',		$plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'admin_menu',				$plugin_admin, 'manage_club_structure');
-		$this->loader->add_action( 'admin_menu',				$plugin_admin, 'manage_prestige');
-		$this->loader->add_action( 'admin_menu',				$plugin_admin, 'audit_prestige');
-		$this->loader->add_action( 'wp_ajax_update_office',		$plugin_admin, 'update_office');
-		$this->loader->add_action( 'wp_ajax_add_prestige_note', $plugin_admin, 'add_prestige_note');
-		$this->loader->add_action( 'wp_ajax_reset_permissions',	$plugin_admin, 'reset_permissions');
+		$this->loader->add_action( 'admin_enqueue_scripts',			$plugin_admin, 'enqueue_styles' );
+		$this->loader->add_action( 'admin_enqueue_scripts',			$plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action( 'admin_menu',					$plugin_admin, 'manage_club_structure');
+		$this->loader->add_action( 'admin_menu',					$plugin_admin, 'manage_prestige');
+		$this->loader->add_action( 'admin_menu',					$plugin_admin, 'audit_prestige');
+		$this->loader->add_action( 'wp_ajax_update_office',			$plugin_admin, 'update_office');
+		$this->loader->add_action( 'wp_ajax_add_prestige_note',		$plugin_admin, 'add_prestige_note');
+		$this->loader->add_action( 'wp_ajax_add_prestige_record',	$plugin_admin, 'add_prestige_record');
+		$this->loader->add_action( 'wp_ajax_reset_permissions',		$plugin_admin, 'reset_permissions');
+		
 	}
 
 	/**

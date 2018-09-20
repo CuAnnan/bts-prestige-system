@@ -1,4 +1,10 @@
 <script type="text/json" id="prestige_records"><?php echo json_encode($prestige_rewards); ?></script>
+<script type="text/json" id="prestige_categories_json"><?php echo json_encode($prestige_categories); ?></script>
+<script type="text/json" id="prestige_actions_json"><?php echo json_encode($prestige_actions); ?></script>
+<script type="text/json" id="domains_json"><?php echo json_encode($domains);?></script>
+<script type="text/json" id="venues_json"><?php echo json_encode($venues);?></script>
+<script type="text/json" id="offices_json"><?php echo json_encode($offices);?></script>
+
 <div class="wrap">
 	<table id="prestige_record_table">
 		<thead>
@@ -17,6 +23,62 @@
 		</thead>
 		<tbody></tbody>
 	</table>
+	<button id="prestige_claim_button" class="btn btn-primary">Claim Prestige</button>
+</div>
+
+<div class="modal" id="newPrestigeRecordModalDialog" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			<form id="newPrestigeRecordForm">
+				<div class="modal-header">
+					<h5>New Prestige Record</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				</div>
+				<div class="modal-body">
+					<div class="container">
+						<div class="row">
+							<label class="col-form-label col-4" for="id_prestige_categories">Prestige Category</label>
+							<div class="col"><select class="form-control" id="id_prestige_categories" required></select></div>
+						</div>
+						<div class="row">
+							<label class="col-form-label col-4" for="id_prestige_actions">Prestige Actions</label>
+							<div class="col"><select class="form-control" id="id_prestige_actions" required></select></div>
+						</div>
+						<div class="row">
+							<label class="col-form-label col-4" for="prestige_reason">Reason</label>
+							<div class="col"><input class="form-control" type="text" id="prestige_reason" required/></div>
+						</div>
+						<div class="row">
+							<label class="col-form-label col-4" for="prestige_amount">Amount</label>
+							<div class="col"><input class="form-control" type="number" id="prestige_amount" size="5" required/></div>
+						</div>
+						<div class="row">
+							<label class="col-form-label col-4" for="prestige_type">Type</label>
+							<div class="col">
+								<select id="prestige_type">
+									<option>Open</option>
+									<option>Regional</option>
+									<option>National</option>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-form-label col-4" for="id_domains" required>Domains</label>
+							<div class="col"><select class="form-control" id="id_domains"></select></div>
+						</div>
+						<div class="row">
+							<label class="col-form-label col-4" for="id_venues">Venues</label>
+							<div class="col"><select class="form-control" id="id_venues"></select></div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary" id="newPrestigeRecordButton">Add Record</button>
+					<button class="btn btn-warning" data-dismiss="modal">Cancel</button>
+				</div>
+			</form>
+		</div>
+	</div>
 </div>
 
 <div class="modal" id="prestigeNotesModalDialog" tabindex="-1" role="dialog">

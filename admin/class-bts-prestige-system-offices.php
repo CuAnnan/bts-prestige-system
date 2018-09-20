@@ -320,4 +320,21 @@ class Bts_Prestige_System_Offices
 		return ['success'=>true];
 	}
 	
+	public static function get_all_active_offices()
+	{
+		global $wpdb;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+		$offices = $wpdb->get_results(
+			"SELECT 
+				o.id, o.title, o.id_domains, o.id_venues, o.id_users, o.chain, v.name AS venue
+			FROM 
+							{$prefix}officers o
+				LEFT JOIN	{$prefix}venues v ON(o.id_venues = v.id)
+			WHERE 
+				id_superior IS NULL 
+				AND (v.id IS NULL OR v.active = 1)
+				AND o.id_domains IS NOT NULL");
+		return $offices;
+	}
+	
 }

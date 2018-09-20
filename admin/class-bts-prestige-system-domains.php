@@ -49,7 +49,9 @@ class Bts_Prestige_System_Domains
 				d.number			AS number,
 				d.location			AS location
 			FROM
-				{$prefix}domains d");
+				{$prefix}domains d
+			ORDER 
+				BY id");
 	}
 	
 	public static function get_managed_domains()

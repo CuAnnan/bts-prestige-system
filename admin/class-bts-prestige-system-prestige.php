@@ -163,4 +163,9 @@ class Bts_Prestige_System_Prestige
 		$prestige_rewards = self::get_prestige_for_user_by_id(get_current_user_id());
 		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-management-page.php');
 	}
+	
+	public static function show_prestige_auditing_page()
+	{
+		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-auditing.php');
+	}
 }

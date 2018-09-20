@@ -288,17 +288,8 @@ class Bts_Prestige_System_Offices
 		}
 	}
 	
-	public static function update_office_roles()
+	public static function reset_office_roles()
 	{
-		$user = wp_get_current_user();
-		$roles = (array) $user->roles;
-		if(!in_array(BTS_MANAGE_CLUB_STRUCTURE_ROLE, $roles))
-		{
-			return ['success'=>false, 'reason'=>'Not permitted'];
-		}
-		
-		self::remove_all_office_permissions();
-		$results = [];
 		$offices = self::get_all_top_level_positions();
 		self::add_domain_coordinator_role(1);
 		foreach($offices as $office)
@@ -313,6 +304,19 @@ class Bts_Prestige_System_Offices
 				self::add_venue_coordinator_role($office->id_users);
 			}
 		}
+	}
+	
+	public static function update_office_roles()
+	{
+		$user = wp_get_current_user();
+		if(!in_array(BTS_MANAGE_CLUB_STRUCTURE_ROLE, (array) $user->roles))
+		{
+			return ['success'=>false, 'reason'=>'Not permitted'];
+		}
+		
+		self::remove_all_office_permissions();
+		self::reset_office_roles();
+		
 		return ['success'=>true];
 	}
 	

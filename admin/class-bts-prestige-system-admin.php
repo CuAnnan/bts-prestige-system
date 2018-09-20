@@ -143,6 +143,22 @@ class Bts_Prestige_System_Admin {
 		);
 	}
 	
+	public function audit_prestige()
+	{
+		add_menu_page(
+			'Prestige Audit',
+			'Prestige Audit',
+			BTS_PRESTIGE_MANAGEMENT_ROLE,
+			'bts_prestige_audit',
+			array($this, 'audit_prestige_page')
+		);
+	}
+	
+	public function audit_prestige_page()
+	{
+		Bts_Prestige_System_Prestige::show_prestige_auditing_page();
+	}
+	
 	public function show_prestige_log()
 	{
 		wp_enqueue_style($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css', array(), $this->version, 'all');

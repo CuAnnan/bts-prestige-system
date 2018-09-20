@@ -51,9 +51,10 @@ class Bts_Prestige_System_Activator {
 		$prestige_role = add_role(BTS_PRESTIGE_MANAGEMENT_ROLE, 'Prestige Management');
 		$prestige_role->add_cap(BTS_PESTIGE_MANAGEMENT_PERM);
 		
-		$admin_role = get_role('administrator');
-		$admin_role->add_cap(BTS_MANAGE_CLUB_STRUCTURE_PERM);
-		$admin_role->add_cap(BTS_PRESTIGE_MANAGEMENT_PERM);
+		$admin = new WP_User(1);
+		$admin->add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
+		$admin->add_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
+		
 	}
 	
 	

@@ -82,7 +82,7 @@
 	
 	function bindNotesButtons()
 	{
-		$('.prestige-note-button').off().click(()=>{showNotes()});
+		$('.prestige-note-button').off().click(showNotes);
 	}
 	
 	function validateAndSubmitPrestigeClaimForm()
@@ -188,7 +188,7 @@
 		{
 			$('<tr/>')
 				.append($('<td/>').text(note.note))
-				.append($('<td/>').text(parseInt(note.approved) === 1))
+				.append($('<td/>').text(note.status))
 				.append($('<td/>').text(note.note_date))
 				.appendTo($notesTable);
 		}

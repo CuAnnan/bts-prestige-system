@@ -237,12 +237,12 @@ class Bts_Prestige_System_Prestige
 		return $wpdb->get_results($sql);
 	}
 	
+	
+	
 	public static function get_mc($prestige)
 	{
 		$mc = ["title"=>"Associate",	"level"=>1,		"prestige"=>50];
-		$index = 0;
-		$searching = true;
-		$mcLevels = count(self::$memberClasses);
+		$index = 0; $searching = true;
 		
 		while($searching)
 		{
@@ -256,13 +256,33 @@ class Bts_Prestige_System_Prestige
 				$searching = false;
 			}
 			$index++;
-			if($index > $mcLevels)
+			if($index > count(self::$memberClasses))
 			{
 				$searching = false;
 			}
 		}
 		
 		return $mc;
+	}
+	
+	public static function get_prestige_to_next_mc($prestige)
+	{
+		$amount = 0; $index = 0; $searching = true;
+		while($searching)
+		{
+			$memberClass = self::$memberClasses[$index];
+			if($prestige < $memberClass['prestige'])
+			{
+				$amount = $memberClass['prestige'] - $prestige;
+				$searching = false;
+			}
+			$index++;
+			if($index > count(self::$memberClasses))
+			{
+				$searching = false;
+			}
+		}
+		return $amount;
 	}
 	
 	public static function show_prestige_management_page()
@@ -275,6 +295,7 @@ class Bts_Prestige_System_Prestige
 		$venues					= Bts_Prestige_System_Venues::get_all_active_venues();
 		$audited_prestige		= self::get_audited_prestige(get_current_user_id());
 		$mc						= self::get_mc($audited_prestige);
+		$prestigeLeft			= self::get_prestige_to_next_mc($audited_prestige);
 		
 		$viewing_own_log		= true;
 		

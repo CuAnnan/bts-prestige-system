@@ -9,7 +9,8 @@
 	<h5>Member Class</h5>
 	<p>
 		<b>Total Audited Prestige: </b><?php echo $audited_prestige; ?><br/>
-		<b>Membership Class: </b><?php echo $mc['title'];?> (<?php echo $mc['level'];?>)
+		<b>Membership Class: </b><?php echo $mc['title'];?> (<?php echo $mc['level'];?>)<br/>
+		<b>Prestige to next MC:</b><?php echo $prestigeLeft;?>
 	</p>
 	<h5>Prestige records</h5>
 	<table id="prestige_record_table">

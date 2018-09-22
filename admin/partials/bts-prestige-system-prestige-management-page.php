@@ -109,8 +109,9 @@
 										if(!$viewing_own_log){
 									?>
 									<select id="prestige_record_approved" class="form-control">
-										<option value="false">Not Approved</option>
-										<option value="true">Approved</option>
+										<option>Submitted</option>
+										<option>Approved</option>
+										<option>Audited</option>
 									</select>
 									<?php 
 									}

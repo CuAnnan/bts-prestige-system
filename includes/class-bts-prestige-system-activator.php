@@ -33,7 +33,7 @@ class Bts_Prestige_System_Activator {
 	public static function activate()
 	{
 		self::buildDatabaseTables();
-		//self::import_old_cam_database();
+		self::import_old_cam_database();
 		self::add_custom_capabilities();
 	}
 	
@@ -49,7 +49,7 @@ class Bts_Prestige_System_Activator {
 		$club_management_role->add_cap(BTS_MANAGE_CLUB_STRUCTURE_PERM);
 		
 		$prestige_role = add_role(BTS_PRESTIGE_MANAGEMENT_ROLE, 'Prestige Management');
-		$prestige_role->add_cap(BTS_PESTIGE_MANAGEMENT_PERM);
+		$prestige_role->add_cap(BTS_PRESTIGE_MANAGEMENT_PERM);
 		
 		$admin = new WP_User(1);
 		$admin->add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
@@ -173,7 +173,7 @@ class Bts_Prestige_System_Activator {
 				'id_users bigint(20) UNSIGNED',
 				'id_officer bigint(20) UNSIGNED',
 				'note varchar(255)',
-				'approved boolean',
+				'status enum("Submitted", "Approved", "Audited") DEFAULT "Submitted"',
 				"date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 				'PRIMARY KEY  (id)',
 				"FOREIGN KEY (id_users) REFERENCES {$wpdb->prefix}users(ID)",
@@ -192,9 +192,9 @@ class Bts_Prestige_System_Activator {
 		{
 			$wpdb->query("DROP TABLE IF EXISTS {$prefix}{$table}");
 		}
-		$wpdb->query("DELETE FROM {$wpdb->prefix}usermeta WHERE user_id > 1");
+		/*$wpdb->query("DELETE FROM {$wpdb->prefix}usermeta WHERE user_id > 1");
 		$wpdb->query("DELETE FROM {$wpdb->prefix}users WHERE ID > 1");
-		$wpdb->query("ALTER TABLE {$wpdb->prefix}users AUTO_INCREMENT = 2;");
+		$wpdb->query("ALTER TABLE {$wpdb->prefix}users AUTO_INCREMENT = 2;");*/
 	}
 	
 	public static function deactivate()

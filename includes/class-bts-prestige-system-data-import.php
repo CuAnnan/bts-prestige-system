@@ -186,7 +186,7 @@ class Bts_Prestige_System_Data_Import
 					/**
 					 * The old system doesn't store either the id of the officer that audited the log or the id of the user that audited it
 					 */
-					Bts_Prestige_System_Prestige::add_record_note($id_prestige_record, null, $record['prlAuditNote'], $record['prlAuditDate'], true, $id_legacy_nrc);
+					Bts_Prestige_System_Prestige::add_record_note($id_prestige_record, null, $record['prlAuditNote'], $record['prlAuditDate'], 'Audited', $id_legacy_nrc);
 				}
 				else
 				{
@@ -257,7 +257,7 @@ class Bts_Prestige_System_Data_Import
 		global $wpdb;
 		$table = $wpdb->prefix.BTS_TABLE_PREFIX."officers";
 		$coordinator_records = $wpdb->get_results("SELECT id_users, id_domains, id_venues FROM $table WHERE id_domains IS NOT NULL AND id_superior IS NULL AND chain = 'Coordinator'");
-		foreach($domain_coordinator_records as $domain_coordinator_record)
+		foreach($coordinator_records as $domain_coordinator_record)
 		{
 			if($domain_coordinator_record->id_venues)
 			{

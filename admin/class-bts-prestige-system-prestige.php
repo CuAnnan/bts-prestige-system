@@ -52,7 +52,7 @@ class Bts_Prestige_System_Prestige
 		return $id_prestige_record;
 	}
 	
-	public static function try_to_add_record_note($id_prestige_record, $note_text, $approved)
+	public static function try_to_add_record_note($id_prestige_record, $note_text, $status)
 	{
 		$id_users = get_current_user_id();
 		$now = date("Y-m-d H:i:s");
@@ -64,7 +64,7 @@ class Bts_Prestige_System_Prestige
 		return self::add_record_note($id_prestige_record, $id_users, $note_text, $now, $approved, $id_officer);
 	}
 	
-	public static function add_record_note($id_prestige_record, $id_users, $note_text, $date_note_added, $approved = false, $id_officer = null)
+	public static function add_record_note($id_prestige_record, $id_users, $note_text, $date_note_added, $status = "Submitted", $id_officer = null)
 	{
 		global $wpdb;
 		$table = $wpdb->prefix.BTS_TABLE_PREFIX."prestige_reward_notes";
@@ -74,7 +74,7 @@ class Bts_Prestige_System_Prestige
 			'id_users'=>$id_users,
 			'note'=>$note_text,
 			'date'=>$date_note_added,
-			'approved'=>$approved
+			'status'=>$status
 		];
 		if($id_officer)
 		{
@@ -88,6 +88,28 @@ class Bts_Prestige_System_Prestige
 		return ['success'=>false, 'message'=>$wpdb->last_error];
 	}
 	
+	public static function get_audited_records($id_users)
+	{
+		global $wpdb;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+		$sql = $wpdb->prepare("
+			SELECT
+				SUM(reward_amount) AS prestige_total
+			FROM 
+				wp_bts_prestige_rewards r
+				JOIN wp_bts_prestige_reward_notes n ON (r.id = n.id_prestige_rewards)
+				JOIN 
+					(SELECT 
+						MAX(id) id, id_prestige_rewards
+					FROM `wp_bts_prestige_reward_notes`
+					WHERE id_officer IS NOT NULL
+					GROUP BY
+						id_prestige_rewards) nij ON (n.id = nij.id)
+			WHERE n.status = 'Audited' AND id_member = %d"
+			, $id_users
+		);
+		
+	}
 	
 	public static function cooerce_record_to_object($record)
 	{
@@ -98,13 +120,13 @@ class Bts_Prestige_System_Prestige
 		{
 			$ordered_record->$basic_field = $record->$basic_field;
 		}
-		$ordered_record->approved = "Not approved";
+		$ordered_record->status = "Submitted";
 		return $ordered_record;
 	}
 	
 	public static function cooerce_record_to_note_object($record)
 	{
-		$note_fields = ["note", "note_officer_title", "note_domain_name", "note_genre_name", "approved", "note_date"];
+		$note_fields = ["note", "note_officer_title", "note_domain_name", "note_genre_name", "status", "note_date"];
 		$note_object = new stdClass();
 		foreach($note_fields as $note_field)
 		{
@@ -131,7 +153,7 @@ class Bts_Prestige_System_Prestige
 				g.name					AS genre_name,
 				pn.id					AS note_id,
 				pn.note					AS note,
-				pn.approved				AS approved,
+				pn.status				AS status,
 				pn.date					AS note_date,
 				n_o.title				AS note_officer_title,
 				dn.name					AS note_domain_name,
@@ -170,9 +192,9 @@ class Bts_Prestige_System_Prestige
 			{
 				$prestige_rewards[$prestige_record->id] = self::cooerce_record_to_object($prestige_record);
 			}
-			if($prestige_record->approved && $prestige_record->note_officer_title)
+			if($prestige_record->note_officer_title)
 			{
-				$prestige_rewards[$prestige_record->id]->approved = ($prestige_record->approved)?'Approved':'Not approved';
+				$prestige_rewards[$prestige_record->id]->status = $prestige_record->status;
 			}
 			$prestige_rewards[$prestige_record->id]->notes[] = self::cooerce_record_to_note_object($prestige_record);
 		}

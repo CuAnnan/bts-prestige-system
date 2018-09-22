@@ -11,10 +11,10 @@
 		$dataTable = null;
 	
 	$(function(){
-		bindEvents();
 		parseJSONElements();
-		buildDataTable(prestigeLog);
+		buildDataTable();
 		buildPrestigeModal();
+		bindEvents();
 	});
 	
 	function parseJSONElements()
@@ -75,9 +75,14 @@
 	function bindEvents()
 	{
 		$('#prestige_record_note_btn').click(addPrestigeNote);
-		$('.prestige-note-button').click(showNotes);
 		$('#prestige_claim_button').click(showPrestigeClaimForm);
 		$('#newPrestigeRecordForm').on('submit', ()=>{validateAndSubmitPrestigeClaimForm(); return false;});
+		bindNotesButtons();
+	}
+	
+	function bindNotesButtons()
+	{
+		$('.prestige-note-button').off().click(()=>{showNotes()});
 	}
 	
 	function validateAndSubmitPrestigeClaimForm()
@@ -124,8 +129,9 @@
 							category:$('#id_prestige_categories option:selected').text(),
 							domain_name:domainName,
 							genre_name:genreName,
-							approved:'Not approved'
+							status:'Submitted'
 						}).draw();
+					bindNotesButtons();
 					$prestigeModal.modal('hide');
 				}
 			}
@@ -145,10 +151,10 @@
 		$prestigeModal.modal('show');
 	}
 	
-	function buildDataTable(data)
+	function buildDataTable()
 	{
 		$dataTable = $('#prestige_record_table').DataTable({
-			data:data,
+			data:prestigeLog,
 			columns:[
 				{data:'description'},
 				{data:'category'},
@@ -158,7 +164,7 @@
 				{data:'officer_title'},
 				{data:'domain_name'},
 				{data:'genre_name'},
-				{data:'approved'},
+				{data:'status'},
 				{data:null, orderable:false, defaultContent:`<button class="btn btn-primary prestige-note-button">Notes</button>`}
 			],
 			createdRow:function(row, data, dataIndex)
@@ -176,7 +182,7 @@
 			data = $row.data(),
 			notes = data.notes,
 			$notesTable =$('#prestige-notes').empty();
-		$('#prestige_record_approved').val('false');
+		$('#prestige_record_approved').val('Submitted');
 		$('#notes_prestige_record_id').val(data.id);
 		for(let note of notes)
 		{
@@ -194,7 +200,7 @@
 		let data = {
 			'action':				'add_prestige_note',
 			'note_text':			$('#prestige_record_note').val(),
-			'approved':				$('#prestige_record_approved').val(),
+			'status':				$('#prestige_record_approved').val(),
 			'id_prestige_record':	$('#notes_prestige_record_id').val()
 		};
 		$.post(
@@ -202,7 +208,7 @@
 			data,
 			function(response)
 			{
-				console.log(response);
+				$('#prestigeNotesModalDialog').modal('close');
 			}
 		);
 	}

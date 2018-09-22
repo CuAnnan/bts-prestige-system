@@ -337,4 +337,16 @@ class Bts_Prestige_System_Offices
 		return $offices;
 	}
 	
+	public static function get_id_offices_by_id_users($id_users)
+	{
+		global $wpdb;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id FROM {$prefix}officers WHERE id_users = %d",
+				$id_users
+			)
+		);
+	}
+	
 }

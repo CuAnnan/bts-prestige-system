@@ -6,6 +6,12 @@
 <script type="text/json" id="offices_json"><?php echo json_encode($offices);?></script>
 
 <div class="wrap">
+	<h5>Member Class</h5>
+	<p>
+		<b>Total Audited Prestige: </b><?php echo $audited_prestige; ?><br/>
+		<b>Membership Class: </b><?php echo $mc['title'];?> (<?php echo $mc['level'];?>)
+	</p>
+	<h5>Prestige records</h5>
 	<table id="prestige_record_table">
 		<thead>
 			<tr>

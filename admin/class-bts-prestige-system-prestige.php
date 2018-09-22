@@ -1,4 +1,7 @@
 <?php
+require_once (plugin_dir_path(__FILE__).'class-bts-prestige-system-domains.php');
+require_once (plugin_dir_path(__FILE__).'class-bts-prestige-system-offices.php');
+	
 
 /* 
  * To change this license header, choose License Headers in Project Properties.
@@ -7,6 +10,24 @@
  */
 class Bts_Prestige_System_Prestige
 {
+	protected static $memberClasses = [
+		["title"=>"Associate",	"level"=>1,		"prestige"=>50],
+		["title"=>"Journeyman",	"level"=>2,		"prestige"=>100],
+		["title"=>"Artisan",	"level"=>3,		"prestige"=>300],
+		["title"=>"Contributor","level"=>4,		"prestige"=>600],
+		["title"=>"Sponsor",	"level"=>5,		"prestige"=>1000],
+		["title"=>"Steward",	"level"=>6,		"prestige"=>1500],
+		["title"=>"Benefactor",	"level"=>7,		"prestige"=>2100],
+		["title"=>"Advocate",	"level"=>8,		"prestige"=>2700],
+		["title"=>"Advisor",	"level"=>9,		"prestige"=>3400],
+		["title"=>"Patron",		"level"=>10,	"prestige"=>4100],
+		["title"=>"Mentor",		"level"=>11,	"prestige"=>4800],
+		["title"=>"Luminary",	"level"=>12,	"prestige"=>5600],
+		["title"=>"Executive",	"level"=>13,	"prestige"=>6400],
+		["title"=>"Fellow",		"level"=>14,	"prestige"=>7200],
+		["title"=>"Trustee",	"level"=>15,	"prestige"=>8000]
+	];
+
 	public static function add_prestige_claim($id_officers, $id_prestige_action, $reward_amount, $reward_type, $reason)
 	{
 		$now = date('Y:m:d H:i:s');
@@ -88,7 +109,7 @@ class Bts_Prestige_System_Prestige
 		return ['success'=>false, 'message'=>$wpdb->last_error];
 	}
 	
-	public static function get_audited_records($id_users)
+	public static function get_audited_prestige($id_users)
 	{
 		global $wpdb;
 		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
@@ -96,19 +117,19 @@ class Bts_Prestige_System_Prestige
 			SELECT
 				SUM(reward_amount) AS prestige_total
 			FROM 
-				wp_bts_prestige_rewards r
-				JOIN wp_bts_prestige_reward_notes n ON (r.id = n.id_prestige_rewards)
+				{$prefix}prestige_rewards r
+				JOIN {$prefix}prestige_reward_notes n ON (r.id = n.id_prestige_rewards)
 				JOIN 
 					(SELECT 
 						MAX(id) id, id_prestige_rewards
-					FROM `wp_bts_prestige_reward_notes`
+					FROM {$prefix}prestige_reward_notes
 					WHERE id_officer IS NOT NULL
 					GROUP BY
 						id_prestige_rewards) nij ON (n.id = nij.id)
 			WHERE n.status = 'Audited' AND id_member = %d"
 			, $id_users
 		);
-		
+		return $wpdb->get_var($sql);
 	}
 	
 	public static function cooerce_record_to_object($record)
@@ -216,18 +237,45 @@ class Bts_Prestige_System_Prestige
 		return $wpdb->get_results($sql);
 	}
 	
+	public static function get_mc($prestige)
+	{
+		$mc = ["title"=>"Associate",	"level"=>1,		"prestige"=>50];
+		$index = 0;
+		$searching = true;
+		$mcLevels = count(self::$memberClasses);
+		
+		while($searching)
+		{
+			$memberClass = self::$memberClasses[$index];
+			if($prestige >= $memberClass['prestige'])
+			{
+				$mc = $memberClass;
+			}
+			else
+			{
+				$searching = false;
+			}
+			$index++;
+			if($index > $mcLevels)
+			{
+				$searching = false;
+			}
+		}
+		
+		return $mc;
+	}
+	
 	public static function show_prestige_management_page()
 	{
-		require_once (plugin_dir_path(__FILE__).'class-bts-prestige-system-domains.php');
-		require_once (plugin_dir_path(__FILE__).'class-bts-prestige-system-offices.php');
-		
-		
 		$prestige_rewards		= self::get_prestige_for_user_by_id(get_current_user_id());
 		$prestige_categories	= self::get_prestige_categories();
 		$prestige_actions		= self::get_prestige_actions();
 		$domains				= Bts_Prestige_System_Domains::get_all_domains();
 		$offices				= Bts_Prestige_System_Offices::get_all_active_offices();
 		$venues					= Bts_Prestige_System_Venues::get_all_active_venues();
+		$audited_prestige		= self::get_audited_prestige(get_current_user_id());
+		$mc						= self::get_mc($audited_prestige);
+		
 		$viewing_own_log		= true;
 		
 		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-management-page.php');
@@ -236,5 +284,15 @@ class Bts_Prestige_System_Prestige
 	public static function show_prestige_auditing_page()
 	{
 		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-auditing.php');
+	}
+	
+	public static function show_prestige_entries_requiring_approval()
+	{
+		$id_offices = Bts_Prestige_System_Domains::get_managed_domains_for_id_users(get_current_user_id());
+		$id_office_holders = [];
+		foreach($id_offices as $id_office)
+		{
+			$id_office_holders[] = "%d";
+		}
 	}
 }

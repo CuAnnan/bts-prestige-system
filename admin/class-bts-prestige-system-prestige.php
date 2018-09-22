@@ -31,6 +31,7 @@ class Bts_Prestige_System_Prestige
 	{
 		global $wpdb;
 		$table = $wpdb->prefix.BTS_TABLE_PREFIX."prestige_rewards";
+		$wpdb->query('START TRANSACTION');
 		$wpdb->insert(
 			$table,[
 				'id_member'=>$id_users,
@@ -41,7 +42,7 @@ class Bts_Prestige_System_Prestige
 				'reward_amount'=>$reward_amount,
 				'reward_type'=>$reward_type
 		]);
-		
+		$wpdb->query('COMMIT');
 		$id_prestige_record = $wpdb->insert_id;
 		
 		if($reason)

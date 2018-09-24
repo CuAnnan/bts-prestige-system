@@ -56,7 +56,7 @@ class Bts_Prestige_System_Domains
 	
 	public static function get_managed_domains()
 	{
-		if(array_intersect(['administrator', 'national_membership_coordinator'],  wp_get_current_user()->roles))
+		if(array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles))
 		{
 			return self::get_all_domains();
 		}

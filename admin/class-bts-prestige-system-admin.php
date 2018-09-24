@@ -156,6 +156,10 @@ class Bts_Prestige_System_Admin {
 	
 	public function audit_prestige_page()
 	{
+		wp_enqueue_style($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css', array(), $this->version, 'all');
+		wp_enqueue_script($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name.'prestige_auditing', plugin_dir_url(__FILE__).'js/prestige_auditing.js', array('jquery'), $this->version, false);
+
 		Bts_Prestige_System_Prestige::show_prestige_auditing_page();
 	}
 	
@@ -173,7 +177,7 @@ class Bts_Prestige_System_Admin {
 		echo json_encode(Bts_Prestige_System_Prestige::try_to_add_record_note(
 			filter_input(INPUT_POST, 'id_prestige_record'),
 			filter_input(INPUT_POST, 'note_text'),
-			filter_input(INPUT_POST, 'approved')
+			filter_input(INPUT_POST, 'status')
 		));
 		exit();
 	}

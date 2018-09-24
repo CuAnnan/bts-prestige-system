@@ -186,7 +186,7 @@ class Bts_Prestige_System_Offices
 		}
 	}
 	
-	public static function add_office_positions($officer)
+	public static function add_office_position_fileds($officer)
 	{
 		$officer->isVC = $officer->chain == 'Coordinator' && $officer->id_superior == null && $officer->id_venues != null;
 		$officer->isDC = $officer->chain == 'Coordinator' && $officer->id_superior == null && $officer->id_venues == null;
@@ -202,8 +202,18 @@ class Bts_Prestige_System_Offices
 				$id_officers
 			)
 		);
-		self::add_office_positions($officer);
+		self::add_office_position_fileds($officer);
 		return $officer;
+	}
+	
+	public static function add_national_office_role($id_users)
+	{
+		$user = new WP_User($id_users);
+		error_log('Trying to add role '.BTS_NATIONAL_OFFICE_ROLE." to ".$id_users);
+		$user->add_role(BTS_NATIONAL_OFFICE_ROLE);
+		
+		error_log($id_users);
+		error_log(print_r($user->roles, true));
 	}
 	
 	/**
@@ -216,6 +226,12 @@ class Bts_Prestige_System_Offices
 			return;
 		}
 		$office = self::get_officer_by_id($id_officers);
+		
+		if($office->id_superior === null && $office->id_domains === 1)
+		{
+			self::add_national_office_role($id_users);
+		}
+		
 		if($office->isDC)
 		{
 			self::check_domain_coordinator_permissions($office, $id_users);
@@ -260,7 +276,7 @@ class Bts_Prestige_System_Offices
 		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		return $wpdb->get_results(
 			"SELECT 
-				o.id, o.title, o.id_domains, o.id_venues, o.id_users, o.chain, v.name AS venue
+				o.id_superior, o.id, o.title, o.id_domains, o.id_venues, o.id_users, o.chain, v.name AS venue
 			FROM 
 							{$prefix}officers o
 				LEFT JOIN	{$prefix}venues v ON(o.id_venues = v.id)
@@ -273,7 +289,7 @@ class Bts_Prestige_System_Offices
 	
 	public static function remove_all_office_permissions()
 	{
-		$roles = [BTS_MANAGE_CLUB_STRUCTURE_ROLE, BTS_PRESTIGE_MANAGEMENT_ROLE];
+		$roles = [BTS_MANAGE_CLUB_STRUCTURE_ROLE, BTS_PRESTIGE_MANAGEMENT_ROLE, BTS_NATIONAL_OFFICE_ROLE];
 		$users_with_roles = get_users([
 			'role__in'=>$roles
 		]);
@@ -294,7 +310,11 @@ class Bts_Prestige_System_Offices
 		self::add_domain_coordinator_role(1);
 		foreach($offices as $office)
 		{
-			self::add_office_positions($office);
+			self::add_office_position_fileds($office);
+			if(intval($office->id_domains) === 1)
+			{
+				self::add_national_office_role($office->id_users);
+			}
 			if($office->isDC)
 			{
 				self::add_domain_coordinator_role($office->id_users);

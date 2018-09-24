@@ -78,11 +78,25 @@ class Bts_Prestige_System_Prestige
 		$id_users = get_current_user_id();
 		$now = date("Y-m-d H:i:s");
 		$id_officer = null;
-		if($approved)
+		self::set_prestige_record_status($id_prestige_record, $status);
+		return self::add_record_note($id_prestige_record, $id_users, $note_text, $now, $status, $id_officer);
+	}
+	
+	public static function set_prestige_record_status($id_prestige_record, $status)
+	{
+		global $wpdb;
+		error_log("Updating status for record {$id_prestige_record} to be $status");
+		$table = $wpdb->prefix.BTS_TABLE_PREFIX."prestige_rewards";
+		$wpdb->update(
+			$table,
+			["status"=>$status],
+			["id"=>$id_prestige_record]
+		);
+		$error = $wpdb->last_error;
+		if($error)
 		{
-			// check that the user can in fact approve the record
+			error_log($error);
 		}
-		return self::add_record_note($id_prestige_record, $id_users, $note_text, $now, $approved, $id_officer);
 	}
 	
 	public static function add_record_note($id_prestige_record, $id_users, $note_text, $date_note_added, $status = "Submitted", $id_officer = null)
@@ -117,16 +131,9 @@ class Bts_Prestige_System_Prestige
 			SELECT
 				SUM(reward_amount) AS prestige_total
 			FROM 
-				{$prefix}prestige_rewards r
-				JOIN {$prefix}prestige_reward_notes n ON (r.id = n.id_prestige_rewards)
-				JOIN 
-					(SELECT 
-						MAX(id) id, id_prestige_rewards
-					FROM {$prefix}prestige_reward_notes
-					WHERE id_officer IS NOT NULL
-					GROUP BY
-						id_prestige_rewards) nij ON (n.id = nij.id)
-			WHERE n.status = 'Audited' AND id_member = %d"
+				{$prefix}prestige_rewards
+			WHERE	
+				status = 'Audited' AND id_member = %d"
 			, $id_users
 		);
 		return $wpdb->get_var($sql);
@@ -134,25 +141,26 @@ class Bts_Prestige_System_Prestige
 	
 	public static function cooerce_record_to_object($record)
 	{
-		$basic_fields = ["id", "officer_id_user", "reward_amount", "reward_type", "date_claimed", "description", "category", "officer_title", "domain_name", "genre_name"];
+		$basic_fields = ["id", "officer_id_user", "member_id_user", "reward_amount", "reward_type", "date_claimed", "description", "category", "officer_title", "domain_name", "genre_name", "status"];
 		$ordered_record = new stdClass();
 		$ordered_record->notes = [];
 		foreach($basic_fields as $basic_field)
 		{
 			$ordered_record->$basic_field = $record->$basic_field;
 		}
-		$ordered_record->status = "Submitted";
+		
 		return $ordered_record;
 	}
 	
 	public static function cooerce_record_to_note_object($record)
 	{
-		$note_fields = ["note", "note_officer_title", "note_domain_name", "note_genre_name", "status", "note_date"];
+		$note_fields = ["note", "note_officer_title", "note_domain_name", "note_genre_name", "note_status", "note_date"];
 		$note_object = new stdClass();
 		foreach($note_fields as $note_field)
 		{
 			$note_object->$note_field = $record->$note_field;
 		}
+		$note_object->status = $note_object->note_status;
 		return $note_object;
 	}
 	
@@ -163,10 +171,12 @@ class Bts_Prestige_System_Prestige
 		$qry = $wpdb->prepare("
 			SELECT 
 				pr.id					AS id,
+				pr.id_member			AS member_id_user,
 				pr.id_member_approved	AS officer_id_user,
 				pr.reward_amount		AS reward_amount,
 				pr.reward_type			AS reward_type,
 				pr.date_claimed			AS date_claimed,
+				pr.status				AS status,
 				pa.description			AS description,
 				pc.name					AS category,
 				o.title					AS officer_title,
@@ -174,7 +184,7 @@ class Bts_Prestige_System_Prestige
 				g.name					AS genre_name,
 				pn.id					AS note_id,
 				pn.note					AS note,
-				pn.status				AS status,
+				pn.status				AS note_status,
 				pn.date					AS note_date,
 				n_o.title				AS note_officer_title,
 				dn.name					AS note_domain_name,
@@ -193,7 +203,6 @@ class Bts_Prestige_System_Prestige
 				LEFT JOIN	{$prefix}venues vn					ON (vn.id	= n_o.id_venues)
 				LEFT JOIN	{$prefix}domains dn					ON (dn.id	= n_o.id_domains)
 				LEFT JOIN	{$prefix}genres dg					ON (dg.id	= vn.id_genres)
-
 			WHERE
 				pr.id_member = %d
 			ORDER BY 
@@ -203,6 +212,12 @@ class Bts_Prestige_System_Prestige
 			",
 			$id_users);
 		
+		return self::get_prestige_records_from_qry($qry);
+	}
+	
+	private static function get_prestige_records_from_qry($qry)
+	{
+		global $wpdb;
 		$prestige_records = $wpdb->get_results($qry);
 		$prestige_rewards = [];
 		// these are the fields of the raw prestige reward request, the nature of hte join query is that you'll get a record per prestige note. This saves there being two
@@ -212,10 +227,6 @@ class Bts_Prestige_System_Prestige
 			if(!isset($prestige_rewards[$prestige_record->id]))
 			{
 				$prestige_rewards[$prestige_record->id] = self::cooerce_record_to_object($prestige_record);
-			}
-			if($prestige_record->note_officer_title)
-			{
-				$prestige_rewards[$prestige_record->id]->status = $prestige_record->status;
 			}
 			$prestige_rewards[$prestige_record->id]->notes[] = self::cooerce_record_to_note_object($prestige_record);
 		}
@@ -296,24 +307,97 @@ class Bts_Prestige_System_Prestige
 		$audited_prestige		= self::get_audited_prestige(get_current_user_id());
 		$mc						= self::get_mc($audited_prestige);
 		$prestigeLeft			= self::get_prestige_to_next_mc($audited_prestige);
-		
 		$viewing_own_log		= true;
-		
 		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-management-page.php');
+	}
+	
+	public static function fetch_managed_prestige_logs()
+	{
+		
 	}
 	
 	public static function show_prestige_auditing_page()
 	{
+		$prestige_records	= self::fetch_prestige_entries_requiring_action();
+		$prestige_categories	= self::get_prestige_categories();
+		$prestige_actions		= self::get_prestige_actions();
+		$domains				= Bts_Prestige_System_Domains::get_all_domains();
+		$offices				= Bts_Prestige_System_Offices::get_all_active_offices();
+		$venues					= Bts_Prestige_System_Venues::get_all_active_venues();
+		
 		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-auditing.php');
 	}
 	
-	public static function show_prestige_entries_requiring_approval()
+	public static function fetch_prestige_entries_requiring_action()
 	{
-		$id_offices = Bts_Prestige_System_Domains::get_managed_domains_for_id_users(get_current_user_id());
-		$id_office_holders = [];
-		foreach($id_offices as $id_office)
+		global $wpdb;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+		$sql = "SELECT 
+				pr.id					AS id,
+				pr.id_member			AS member_id_user,
+				pr.id_member_approved	AS officer_id_user,
+				pr.reward_amount		AS reward_amount,
+				pr.reward_type			AS reward_type,
+				pr.date_claimed			AS date_claimed,
+				pa.description			AS description,
+				pr.status				AS status,
+				pc.name					AS category,
+				o.title					AS officer_title,
+				d.name					AS domain_name,
+				g.name					AS genre_name,
+				pn.id					AS note_id,
+				pn.note					AS note,
+				pn.status				AS note_status,
+				pn.date					AS note_date,
+				n_o.title				AS note_officer_title,
+				dn.name					AS note_domain_name,
+				dg.name					AS note_genre_name
+			FROM
+							{$prefix}prestige_rewards pr
+				LEFT JOIN	{$prefix}prestige_actions pa		ON (pa.id	= pr.id_prestige_action)
+				LEFT JOIN	{$prefix}prestige_categories pc		ON (pc.id	= pa.id_prestige_category)
+				LEFT JOIN	{$prefix}prestige_reward_notes pn	ON (pr.id	= pn.id_prestige_rewards)
+				LEFT JOIN	{$prefix}officers o					ON (o.id	= pr.id_officer_approved)
+				LEFT JOIN	{$prefix}venues v					ON (v.id	= o.id_venues)
+				LEFT JOIN	{$prefix}domains d					ON (d.id	= o.id_domains)
+				LEFT JOIN	{$prefix}genres g					ON (g.id	= v.id_genres)
+				LEFT JOIN	{$wpdb->prefix}users nu				ON (nu.ID	= pn.id_users)
+				LEFT JOIN	{$prefix}officers n_o				ON (n_o.id	= pn.id_officer)
+				LEFT JOIN	{$prefix}venues vn					ON (vn.id	= n_o.id_venues)
+				LEFT JOIN	{$prefix}domains dn					ON (dn.id	= n_o.id_domains)
+				LEFT JOIN	{$prefix}genres dg					ON (dg.id	= vn.id_genres)
+			WHERE
+				pr.status  != 'Audited'";
+		error_log(print_r(wp_get_current_user()->roles, true));
+		error_log(BTS_NATIONAL_OFFICE_ROLE);
+		if(!array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles))
 		{
-			$id_office_holders[] = "%d";
+			$sql = $wpdb->prepare(
+				$sql.' AND o.id_users = %d',
+				get_current_user_id()
+			);
 		}
+		
+		$prestige_records = self::get_prestige_records_from_qry($sql);
+		
+		$users = [];
+		
+		foreach($prestige_records as $record)
+		{
+			if(!isset($users[$record->member_id_user]))
+			{
+				$raw_user_meta = get_user_meta($record->member_id_user);
+				$users[$record->member_id_user] = [
+						'first_name'=>$raw_user_meta['first_name'][0],
+						'last_name'=>$raw_user_meta['last_name'][0],
+						'number'=>$raw_user_meta['nickname'][0]
+				];
+			}
+			$record->first_name	= $users[$record->member_id_user]['first_name'];
+			$record->last_name	= $users[$record->member_id_user]['last_name'];
+			$record->number		= $users[$record->member_id_user]['number'];
+		}
+		
+		return $prestige_records;
 	}
 }

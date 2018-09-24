@@ -45,6 +45,9 @@ define('BTS_MANAGE_CLUB_STRUCTURE_PERM', 'club_management');
 define('BTS_PRESTIGE_MANAGEMENT_ROLE', 'prestige_manager');
 define('BTS_PRESTIGE_MANAGEMENT_PERM', 'prestige_management');
 
+define('BTS_NATIONAL_OFFICE_ROLE', 'national_office_role');
+define('BTS_NATIONAL_OFFICE_PERM', 'national_office_perm');
+
 define('BTS_ABS_PATH', plugin_dir_path(__FILE__));
 
 /**

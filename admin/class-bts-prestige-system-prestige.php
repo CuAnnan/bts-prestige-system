@@ -324,6 +324,7 @@ class Bts_Prestige_System_Prestige
 		$domains				= Bts_Prestige_System_Domains::get_all_domains();
 		$offices				= Bts_Prestige_System_Offices::get_all_active_offices();
 		$venues					= Bts_Prestige_System_Venues::get_all_active_venues();
+		$can_audit				= array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles);
 		
 		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-auditing.php');
 	}

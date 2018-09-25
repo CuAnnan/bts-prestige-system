@@ -287,7 +287,7 @@ class Bts_Prestige_System_Prestige
 				$searching = false;
 			}
 			$index++;
-			if($index > count(self::$memberClasses))
+			if($index >= count(self::$memberClasses))
 			{
 				$searching = false;
 			}

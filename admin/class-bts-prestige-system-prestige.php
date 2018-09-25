@@ -254,7 +254,6 @@ class Bts_Prestige_System_Prestige
 	{
 		$mc = ["title"=>"Associate",	"level"=>1,		"prestige"=>50];
 		$index = 0; $searching = true;
-		
 		while($searching)
 		{
 			$memberClass = self::$memberClasses[$index];
@@ -267,7 +266,7 @@ class Bts_Prestige_System_Prestige
 				$searching = false;
 			}
 			$index++;
-			if($index > count(self::$memberClasses))
+			if($index >= count(self::$memberClasses))
 			{
 				$searching = false;
 			}
@@ -305,6 +304,7 @@ class Bts_Prestige_System_Prestige
 		$offices				= Bts_Prestige_System_Offices::get_all_active_offices();
 		$venues					= Bts_Prestige_System_Venues::get_all_active_venues();
 		$audited_prestige		= self::get_audited_prestige(get_current_user_id());
+		
 		$mc						= self::get_mc($audited_prestige);
 		$prestigeLeft			= self::get_prestige_to_next_mc($audited_prestige);
 		$viewing_own_log		= true;

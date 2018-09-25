@@ -369,8 +369,7 @@ class Bts_Prestige_System_Prestige
 				LEFT JOIN	{$prefix}genres dg					ON (dg.id	= vn.id_genres)
 			WHERE
 				pr.status  != 'Audited'";
-		error_log(print_r(wp_get_current_user()->roles, true));
-		error_log(BTS_NATIONAL_OFFICE_ROLE);
+		
 		if(!array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles))
 		{
 			$sql = $wpdb->prepare(

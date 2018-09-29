@@ -177,7 +177,7 @@
 			{
 				$(row).data({notes:data.notes, id:data.id});
 			},
-			order:[[4, 'asc']],
+			order:[[4, 'desc']],
 		});
 	}
 	

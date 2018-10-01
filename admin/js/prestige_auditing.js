@@ -123,8 +123,11 @@
 		let	data = $row.data(),
 			notes = data.notes,
 			$notesTable =$('#prestige-notes').empty(),
-			currentStatus = notes[notes.length - 1].note_status;
-		$(`input[name=prestige_record_approved][value=${currentStatus}]`).prop('checked', true);
+			currentStatus = notes[notes.length - 1].note_status,
+			$status_button = $(`input[name='prestige_record_approved'][value='${currentStatus}']`);
+		$('.prestige-record-approved').removeClass('active');
+		$status_button.prop('checked', true);
+		$status_button.closest('.prestige-record-approved').addClass('active');
 		$('#prestige_record_approved').val('Submitted');
 		$('#notes_prestige_record_id').val(data.id);
 		for(let note of notes)
@@ -148,6 +151,8 @@
 			},
 			$dtRow = $dataTable.row($row),
 			rowData = $dtRow.data();
+			rowData.status = data.status;
+		
 		$.post(
 			ajaxurl,
 			data,
@@ -159,7 +164,7 @@
 				}
 				else
 				{
-					console.log(rowData);
+					$dtRow.data(rowData).draw();
 				}
 				$('#prestigeNotesModalDialog').modal('hide');
 			}

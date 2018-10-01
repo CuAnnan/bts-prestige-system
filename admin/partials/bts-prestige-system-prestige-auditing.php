@@ -56,14 +56,14 @@
 								<td><input type="text" class="form-control" style="width:100%" id="prestige_record_note"/></td>
 								<td>
 									<div class="btn-group btn-group-toggle" data-toggle="buttons">
-										<label class="btn btn-secondary active">
+										<label class="prestige-record-approved btn btn-secondary active">
 											<input type="radio" name="prestige_record_approved" id="option1" value="Submitted"/> Submitted
 										</label>
-										<label class="btn btn-secondary">
+										<label class="prestige-record-approved btn btn-secondary">
 											<input type="radio" name="prestige_record_approved" id="option2" value="Approved"/> Approved
 										</label>
 										<?php if($can_audit) { ?>
-										<label class="btn btn-secondary">
+										<label class="prestige-record-approved btn btn-secondary">
 											<input type="radio" name="prestige_record_approved" id="option3" value="Audited"/> Audited
 										</label>
 										<?php } ?>

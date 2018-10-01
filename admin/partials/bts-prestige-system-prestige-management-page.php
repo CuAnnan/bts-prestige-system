@@ -63,13 +63,13 @@
 							<label class="col-form-label col-4" for="prestige_type">Type</label>
 							<div class="col">
 								<div class="btn-group btn-group-toggle" data-toggle="buttons">
-									<label class="btn btn-secondary active">
+									<label class="prestige-type btn btn-secondary active">
 										<input type="radio" name="prestige_type" id="option1" value="Open" checked/> Open
 									</label>
-									<label class="btn btn-secondary">
+									<label class="prestige-type btn btn-secondary">
 										<input type="radio" name="prestige_type" id="option2" value="Regional"/> Regional
 									</label>
-									<label class="btn btn-secondary">
+									<label class="prestige-type btn btn-secondary">
 										<input type="radio" name="prestige_type" id="option3" value="National"/> National
 									</label>
 								</div>

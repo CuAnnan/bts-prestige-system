@@ -145,6 +145,12 @@
 		$('#id_prestige_categories').val('');
 		$('#id_domains').val('');
 		$('#id_prestige_actions').empty();
+		$('.prestige-type').removeClass('active');
+		$('input[name=prestige_type][value=Open]')
+			.prop("checked", true)
+			.closest('.prestige-type')
+			.addClass('active');
+		
 		$('#id_venues').empty();
 		$('#prestige_reason').val('');
 		$('#prestige_amount').val('');

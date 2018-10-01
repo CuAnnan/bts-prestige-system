@@ -55,13 +55,19 @@
 							<tr>
 								<td><input type="text" class="form-control" style="width:100%" id="prestige_record_note"/></td>
 								<td>
-									<select id="prestige_record_approved" class="form-control">
-										<option>Submitted</option>
-										<option>Approved</option>
+									<div class="btn-group btn-group-toggle" data-toggle="buttons">
+										<label class="btn btn-secondary active">
+											<input type="radio" name="prestige_record_approved" id="option1" value="Submitted"/> Submitted
+										</label>
+										<label class="btn btn-secondary">
+											<input type="radio" name="prestige_record_approved" id="option2" value="Approved"/> Approved
+										</label>
 										<?php if($can_audit) { ?>
-										<option>Audited</option>
+										<label class="btn btn-secondary">
+											<input type="radio" name="prestige_record_approved" id="option3" value="Audited"/> Audited
+										</label>
 										<?php } ?>
-									</select>
+									</div>
 								</td>
 								<td>
 									<button class="btn btn-primary" id="prestige_record_note_btn">Add note</button>

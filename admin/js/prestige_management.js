@@ -103,7 +103,7 @@
 				id_officers:parseInt(officer.id),
 				id_prestige_actions:$('#id_prestige_actions').val(),
 				prestige_amount:parseInt($('#prestige_amount').val()),
-				prestige_type:$('#prestige_type').val(),
+				prestige_type:$('input[name=prestige_type]:checked').val(),
 				reason:$('#prestige_reason').val()
 			},
 			domainName = $('#id_domains option:selected').text(),

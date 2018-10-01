@@ -1,13 +1,13 @@
 (function( $ ) {
 	'use strict';
 	
-	let $prestigeModal = $('#newPrestigeRecordModalDialog'),
-		prestigeCategories = null,
+	let prestigeCategories = null,
 		prestigeActions = null,
 		domains = null,
 		venues = null,
 		offices = null,
 		prestigeRecords = null,
+		$row = null,
 		$dataTable = null;
 	
 	$(function(){
@@ -75,8 +75,6 @@
 	function bindEvents()
 	{
 		$('#prestige_record_note_btn').click(addPrestigeNote);
-		$('#prestige_claim_button').click(showPrestigeClaimForm);
-		$('#newPrestigeRecordForm').on('submit', ()=>{validateAndSubmitPrestigeClaimForm(); return false;});
 		bindNotesButtons();
 	}
 	
@@ -85,78 +83,15 @@
 		$('.prestige-note-button').off().click(showNotes);
 	}
 	
-	function validateAndSubmitPrestigeClaimForm()
-	{
-		let idDomains = $('#id_domains').val(),
-			idVenues = $('#id_venues').val(),
-			officer = null;
-		if(idVenues)
-		{
-			officer = offices.filter(office=>office.id_venues === idVenues && office.chain === 'Coordinator')[0];
-		}
-		else
-		{
-			officer = offices.filter(office=>office.id_domains === idDomains && office.chain === 'Coordinator')[0];
-		}
-		let data = {
-				action: 'add_prestige_record',
-				id_officers:parseInt(officer.id),
-				id_prestige_actions:$('#id_prestige_actions').val(),
-				prestige_amount:parseInt($('#prestige_amount').val()),
-				prestige_type:$('#prestige_type').val(),
-				reason:$('#prestige_reason').val()
-			},
-			domainName = $('#id_domains option:selected').text(),
-			genreName = idVenues?$('#id_venues option:selected').text():null;
-		
-		$.post(
-			ajaxurl,
-			data,
-			function(response)
-			{
-				if(response.success)
-				{
-					$dataTable.row.add(
-						{
-							"notes":[{note:data.reason, note_officer_title:officer.title, note_domain_name:domainName, note_genre_name:genreName, approved:"0", note_date:response.date}],
-							"id":response.id,
-							officer_id_user:officer.id_users,
-							officer_title:officer.title,
-							reward_type:data.prestige_type,
-							reward_amount:data.prestige_amount,
-							date_claimed:response.date,
-							description: $('#id_prestige_actions option:selected').text(),
-							category:$('#id_prestige_categories option:selected').text(),
-							domain_name:domainName,
-							genre_name:genreName,
-							status:'Submitted'
-						}).draw();
-					bindNotesButtons();
-					$prestigeModal.modal('hide');
-				}
-			}
-		);
-		
-		return false;
-	}
-	
-	function showPrestigeClaimForm()
-	{
-		$('#id_prestige_categories').val('');
-		$('#id_domains').val('');
-		$('#id_prestige_actions').empty();
-		$('#id_venues').empty();
-		$('#prestige_reason').val('');
-		$('#prestige_amount').val('');
-		$prestigeModal.modal('show');
-	}
-	
 	function buildDataTable()
 	{
+		/*
+		 * A function to concatenate the user's firstname, last name, and membership number
+		 */
 		let user = (data)=>
 		{
 			return `${data.first_name} ${data.last_name} (${data.number})`;
-		}
+		};
 		
 		$dataTable = $('#prestige_record_table').DataTable({
 			data:prestigeRecords,
@@ -177,17 +112,19 @@
 			{
 				$(row).data({notes:data.notes, id:data.id});
 			},
-			order:[[4, 'desc']],
+			order:[[4, 'desc']]
 		});
 	}
 	
 	function showNotes()
 	{
-		let $button = $(this),
-			$row = $button.closest('tr'),
-			data = $row.data(),
+		let $button = $(this);
+		$row = $button.closest('tr');
+		let	data = $row.data(),
 			notes = data.notes,
-			$notesTable =$('#prestige-notes').empty();
+			$notesTable =$('#prestige-notes').empty(),
+			currentStatus = notes[notes.length - 1].note_status;
+		$(`input[name=prestige_record_approved][value=${currentStatus}]`).prop('checked', true);
 		$('#prestige_record_approved').val('Submitted');
 		$('#notes_prestige_record_id').val(data.id);
 		for(let note of notes)
@@ -204,16 +141,26 @@
 	function addPrestigeNote()
 	{
 		let data = {
-			'action':				'add_prestige_note',
-			'note_text':			$('#prestige_record_note').val(),
-			'status':				$('#prestige_record_approved').val(),
-			'id_prestige_record':	$('#notes_prestige_record_id').val()
-		};
+				'action':				'add_prestige_note',
+				'note_text':			$('#prestige_record_note').val(),
+				'status':				$('input[name=prestige_record_approved]:checked').val(),
+				'id_prestige_record':	$('#notes_prestige_record_id').val()
+			},
+			$dtRow = $dataTable.row($row),
+			rowData = $dtRow.data();
 		$.post(
 			ajaxurl,
 			data,
 			function(response)
 			{
+				if(data.status === 'Audited')
+				{
+					$dtRow.remove().draw();
+				}
+				else
+				{
+					console.log(rowData);
+				}
 				$('#prestigeNotesModalDialog').modal('hide');
 			}
 		);

@@ -43,39 +43,50 @@
 				</div>
 				<div class="modal-body">
 					<div class="container">
-						<div class="row">
+						<div class="form-group row">
 							<label class="col-form-label col-4" for="id_prestige_categories">Prestige Category</label>
 							<div class="col"><select class="form-control" id="id_prestige_categories" required></select></div>
 						</div>
-						<div class="row">
+						<div class="form-group row">
 							<label class="col-form-label col-4" for="id_prestige_actions">Prestige Actions</label>
 							<div class="col"><select class="form-control" id="id_prestige_actions" required></select></div>
 						</div>
-						<div class="row">
+						<div class="form-group row">
 							<label class="col-form-label col-4" for="prestige_reason">Reason</label>
 							<div class="col"><input class="form-control" type="text" id="prestige_reason" required/></div>
 						</div>
-						<div class="row">
+						<div class="form-group row">
 							<label class="col-form-label col-4" for="prestige_amount">Amount</label>
 							<div class="col"><input class="form-control" type="number" id="prestige_amount" size="5" required/></div>
 						</div>
-						<div class="row">
+						<div class="form-group row">
 							<label class="col-form-label col-4" for="prestige_type">Type</label>
 							<div class="col">
-								<select id="prestige_type">
-									<option>Open</option>
-									<option>Regional</option>
-									<option>National</option>
-								</select>
+								<div class="btn-group btn-group-toggle" data-toggle="buttons">
+									<label class="btn btn-secondary active">
+										<input type="radio" name="prestige_type" id="option1" value="Open" checked/> Open
+									</label>
+									<label class="btn btn-secondary">
+										<input type="radio" name="prestige_type" id="option2" value="Regional"/> Regional
+									</label>
+									<label class="btn btn-secondary">
+										<input type="radio" name="prestige_type" id="option3" value="National"/> National
+									</label>
+								</div>
 							</div>
 						</div>
-						<div class="row">
-							<label class="col-form-label col-4" for="id_domains" required>Domains</label>
+						<div class="form-group row">
+							<label class="col-form-label col-4" for="id_domains" required>Domain</label>
 							<div class="col"><select class="form-control" id="id_domains"></select></div>
 						</div>
-						<div class="row">
-							<label class="col-form-label col-4" for="id_venues">Venues</label>
-							<div class="col"><select class="form-control" id="id_venues"></select></div>
+						<div class="form-group row">
+							<label class="col-form-label col-4" for="id_venues">Venue</label>
+							<div class="col">
+								<select class="form-control" id="id_venues"></select>
+								<small class="form-text text-muted">
+									To claim prestige from the DC, leave the venue blank.
+								</small>
+							</div>
 						</div>
 					</div>
 				</div>

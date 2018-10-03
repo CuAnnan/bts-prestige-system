@@ -7,6 +7,7 @@
  */
 require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-offices.php';
 require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-genres.php';
+require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-users.php';
 
 class Bts_Prestige_System_Domains
 {
@@ -87,8 +88,9 @@ class Bts_Prestige_System_Domains
 	public static function show_domain_management_page()
 	{
 		$managed_domains = self::get_managed_domains();
-		$officers	= Bts_Prestige_System_Offices::get_offices_by_id_domains($managed_domains);
-		$genres		= Bts_Prestige_System_Genres::get_genres();
+		$officers		= Bts_Prestige_System_Offices::get_offices_by_id_domains($managed_domains);
+		$genres			= Bts_Prestige_System_Genres::get_genres();
+		$usersMetaData	= Bts_Prestige_System_Users::getUsermeta();
 		require_once plugin_dir_path(__FILE__).'/partials/bts-prestige-system-management-page.php';
 	}
 }

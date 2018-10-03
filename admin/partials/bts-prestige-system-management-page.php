@@ -26,14 +26,6 @@ function convert_officer_row_to_data($officer)
 	return join(' ', $dataStrings);
 }
 
-$users = get_users(['fields'=>['id']]);
-$usersMetaData = [];
-foreach($users as $user_id)
-{
-	$meta = get_user_meta($user_id->id);
-	$meta['id'] = $user_id->id;
-    $usersMetaData[] = $meta;
-}
 echo '<script type="text/json" id="allUsersMeta">'.json_encode($usersMetaData).'</script>'."\n";
 echo '<script type="text/json" id="officerHeirarchy">'.json_encode($officers).'</script>';
 ?>

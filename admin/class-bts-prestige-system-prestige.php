@@ -1,7 +1,7 @@
 <?php
 require_once (plugin_dir_path(__FILE__).'class-bts-prestige-system-domains.php');
 require_once (plugin_dir_path(__FILE__).'class-bts-prestige-system-offices.php');
-	
+require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-users.php';	
 
 /* 
  * To change this license header, choose License Headers in Project Properties.
@@ -73,11 +73,10 @@ class Bts_Prestige_System_Prestige
 		return $id_prestige_record;
 	}
 	
-	public static function try_to_add_record_note($id_prestige_record, $note_text, $status)
+	public static function try_to_add_record_note($id_prestige_record, $note_text, $status, $id_officer)
 	{
 		$id_users = get_current_user_id();
 		$now = date("Y-m-d H:i:s");
-		$id_officer = null;
 		self::set_prestige_record_status($id_prestige_record, $status);
 		return self::add_record_note($id_prestige_record, $id_users, $note_text, $now, $status, $id_officer);
 	}
@@ -325,6 +324,7 @@ class Bts_Prestige_System_Prestige
 		$offices				= Bts_Prestige_System_Offices::get_all_active_offices();
 		$venues					= Bts_Prestige_System_Venues::get_all_active_venues();
 		$can_audit				= array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles);
+		$usersMetaData			= Bts_Prestige_System_Users::getUsermeta();
 		
 		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-auditing.php');
 	}

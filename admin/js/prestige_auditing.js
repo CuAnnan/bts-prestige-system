@@ -14,6 +14,7 @@
 		parseJSONElements();
 		buildDataTable();
 		buildPrestigeModal();
+		populateSelect('#acting_office', offices.filter((office)=>office.id_users == user_id), 'title');
 		bindEvents();
 	});
 	
@@ -147,7 +148,8 @@
 				'action':				'add_prestige_note',
 				'note_text':			$('#prestige_record_note').val(),
 				'status':				$('input[name=prestige_record_approved]:checked').val(),
-				'id_prestige_record':	$('#notes_prestige_record_id').val()
+				'id_prestige_record':	$('#notes_prestige_record_id').val(),
+				'id_acting_officer':	$('#acting_office').val()
 			},
 			$dtRow = $dataTable.row($row),
 			rowData = $dtRow.data();

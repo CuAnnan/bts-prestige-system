@@ -44,36 +44,49 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 			</div>
 			<form id="newPrestigeRecordForm">
+				<input type="hidden" id="prestige_reward_id_user"/>
+				<input type="hidden" id="prestige_reward_first_name"/>
+				<input type="hidden" id="prestige_reward_last_name"/>
+				<input type="hidden" id="prestige_reward_membership_number"/>
 				<div class="modal-body">
 					<div class="container">
 						<div class="form-group row">
-							<label class="col-form-label col-4" for="id_prestige_categories">Prestige Category</label>
-							<div class="col"><select class="form-control" id="id_prestige_categories" required></select></div>
+							<label class="col-form-label col-4" for="prestige_reward_user_search">Member</label>
+							<div class="col">
+								<input type="text" class="form-control" id="prestige_reward_user_search" required/>
+								<small class="form-text text-muted">
+									The user field is searchable based on first name, last name, and/or membership number
+								</small>
+							</div>
 						</div>
 						<div class="form-group row">
-							<label class="col-form-label col-4" for="id_prestige_actions">Prestige Actions</label>
-							<div class="col"><select class="form-control" id="id_prestige_actions" required></select></div>
+							<label class="col-form-label col-4" for="prestige_reward_id_prestige_categories">Prestige Category</label>
+							<div class="col"><select class="form-control" id="prestige_reward_id_prestige_categories" required></select></div>
 						</div>
 						<div class="form-group row">
-							<label class="col-form-label col-4" for="prestige_reason">Reason</label>
-							<div class="col"><input class="form-control" type="text" id="prestige_reason" required/></div>
+							<label class="col-form-label col-4" for="prestige_reward_id_prestige_actions">Prestige Actions</label>
+							<div class="col"><select class="form-control" id="prestige_reward_id_prestige_actions" required></select></div>
 						</div>
 						<div class="form-group row">
-							<label class="col-form-label col-4" for="prestige_amount">Amount</label>
-							<div class="col"><input class="form-control" type="number" id="prestige_amount" size="5" required/></div>
+							<label class="col-form-label col-4" for="prestige_reward_reason">Reason</label>
+							<div class="col"><input class="form-control" type="text" id="prestige_reward_reason" required/></div>
 						</div>
 						<div class="form-group row">
-							<label class="col-form-label col-4" for="prestige_type">Type</label>
+							<label class="col-form-label col-4" for="prestige_reward_amount">Amount</label>
+							<div class="col"><input class="form-control" type="number" id="prestige_reward_amount" size="5" required/></div>
+						</div>
+						<div class="form-group row">
+							<label class="col-form-label col-4" for="prestige_reward_type">Type</label>
 							<div class="col">
 								<div class="btn-group btn-group-toggle" data-toggle="buttons">
 									<label class="prestige-type btn btn-secondary active">
-										<input type="radio" name="prestige_type" id="option1" value="Open" checked/> Open
+										<input type="radio" name="prestige_reward_type" id="prestige_reward_open" value="Open" checked/> Open
 									</label>
 									<label class="prestige-type btn btn-secondary">
-										<input type="radio" name="prestige_type" id="option2" value="Regional"/> Regional
+										<input type="radio" name="prestige_reward_type" id="prestige_reward_regional" value="Regional"/> Regional
 									</label>
 									<label class="prestige-type btn btn-secondary">
-										<input type="radio" name="prestige_type" id="option3" value="National"/> National
+										<input type="radio" name="prestige_reward_type" id="prestige_reward_national" value="National"/> National
 									</label>
 								</div>
 							</div>

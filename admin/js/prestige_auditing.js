@@ -7,6 +7,7 @@
 		venues = null,
 		offices = null,
 		prestigeRecords = null,
+		users = null,
 		$row = null,
 		$dataTable = null;
 	
@@ -15,8 +16,33 @@
 		buildDataTable();
 		buildPrestigeModal();
 		populateSelect('#acting_office', offices.filter((office)=>office.id_users == user_id), 'title');
+		buildUserAutoComplete();
 		bindEvents();
 	});
+	
+	function buildUserAutoComplete()
+	{
+		let $autoComplete = $('#prestige_reward_user_search');
+		var options = {
+			data:users,
+			adjustWidth:0,
+			getValue: function(element){return `${element.first_name} ${element.last_name} (${element.membership_number})`;},
+			list: {
+				match: {
+					enabled: true
+				},
+				onSelectItemEvent: function()
+				{
+					let data = $autoComplete.getSelectedItemData();
+					$('#prestige_reward_id_users').val(data.id);
+					$('#prestige_reward_first_name').val(data.first_name);
+					$('#prestige_reward_last_name').val(data.last_name);
+					$('#prestige_reward_membership_number').val(data.membership_number);
+				}
+			}
+		};
+		$autoComplete.easyAutocomplete(options);
+	}
 	
 	function parseJSONElements()
 	{
@@ -25,6 +51,7 @@
 		domains = parseJSONElement('domains_json');
 		venues = parseJSONElement('venues_json');
 		offices = parseJSONElement('offices_json');
+		users = parseJSONElement('users_json');
 		prestigeRecords = Object.values(parseJSONElement('prestige_records_requiring_approval'));
 	}
 	
@@ -58,24 +85,18 @@
 	
 	function buildPrestigeModal()
 	{
-		populateSelect('#id_prestige_categories', prestigeCategories, 'name', populateActions);
-		populateSelect('#id_domains', domains, 'name', populateVenues);
-		
+		populateSelect('#prestige_reward_id_prestige_categories', prestigeCategories, 'name', populateActions);
 	}
 	
 	function populateActions()
 	{
-		populateSelect('#id_prestige_actions', prestigeActions.filter(action => action.id_prestige_category === $('#id_prestige_categories').val()), 'description');
-	}
-	
-	function populateVenues()
-	{
-		populateSelect('#id_venues', venues.filter(venue => venue.id_domains === $('#id_domains').val()), 'genre');
+		populateSelect('#prestige_reward_id_prestige_actions', prestigeActions.filter(action => action.id_prestige_category === $('#prestige_reward_id_prestige_categories').val()), 'description');
 	}
 	
 	function bindEvents()
 	{
 		$('#prestige_record_note_btn').click(addPrestigeNote);
+		$('#addPrestigeReward').click(showPrestigeRewardModal);
 		bindNotesButtons();
 	}
 	
@@ -171,6 +192,20 @@
 				$('#prestigeNotesModalDialog').modal('hide');
 			}
 		);
+	}
+	
+	function showPrestigeRewardModal()
+	{
+		let $form = $('#newPrestigeRecordForm');
+		$('input[type=text]', $form).val('');
+		$('select', $form).val('');
+		$('.prestige-type').removeClass('active');
+		$('#prestige_reward_open')
+			.prop('checked', true)
+			.closest('.prestige-type')
+			.addClass('active');
+		$('#prestigeAddModalDialog').modal('show');
+		
 	}
 	
 })(jQuery);

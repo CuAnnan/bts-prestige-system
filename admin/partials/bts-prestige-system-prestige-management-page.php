@@ -76,6 +76,12 @@
 							</div>
 						</div>
 						<div class="form-group row">
+							<label class="col-form-label col-4" for="claim_date">Date of Claim:</label>
+							<div class="col">
+								<input type="date" id="claim_date" class="form-control"/>
+							</div>
+						</div>
+						<div class="form-group row">
 							<label class="col-form-label col-4" for="id_domains" required>Domain</label>
 							<div class="col"><select class="form-control" id="id_domains"></select></div>
 						</div>

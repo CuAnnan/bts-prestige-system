@@ -195,7 +195,8 @@ class Bts_Prestige_System_Admin {
 			filter_input(INPUT_POST, 'id_prestige_actions'),
 			filter_input(INPUT_POST, 'prestige_amount'),
 			filter_input(INPUT_POST, 'prestige_type'),
-			filter_input(INPUT_POST, 'reason')
+			filter_input(INPUT_POST, 'reason'),
+			filter_input(INPUT_POST, 'date')
 		));
 		exit();
 	}

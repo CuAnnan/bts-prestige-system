@@ -104,7 +104,8 @@
 				id_prestige_actions:$('#id_prestige_actions').val(),
 				prestige_amount:parseInt($('#prestige_amount').val()),
 				prestige_type:$('input[name=prestige_type]:checked').val(),
-				reason:$('#prestige_reason').val()
+				reason:$('#prestige_reason').val(),
+				date:$('#claim_date').val()
 			},
 			domainName = $('#id_domains option:selected').text(),
 			genreName = idVenues?$('#id_venues option:selected').text():null;
@@ -142,6 +143,11 @@
 	
 	function showPrestigeClaimForm()
 	{
+		let now = new Date(),
+			day = ("0" + now.getDate()).slice(-2),
+			month = ("0" + (now.getMonth() + 1)).slice(-2),
+			year = now.getFullYear();
+		
 		$('#id_prestige_categories').val('');
 		$('#id_domains').val('');
 		$('#id_prestige_actions').empty();
@@ -150,7 +156,7 @@
 			.prop("checked", true)
 			.closest('.prestige-type')
 			.addClass('active');
-		
+		$('#claim_date').val(`${year}-${month}-${day}`);
 		$('#id_venues').empty();
 		$('#prestige_reason').val('');
 		$('#prestige_amount').val('');

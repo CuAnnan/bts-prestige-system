@@ -28,15 +28,14 @@ class Bts_Prestige_System_Prestige
 		["title"=>"Trustee",	"level"=>15,	"prestige"=>8000]
 	];
 
-	public static function add_prestige_claim($id_officers, $id_prestige_action, $reward_amount, $reward_type, $reason)
+	public static function add_prestige_claim($id_officers, $id_prestige_action, $reward_amount, $reward_type, $reason, $date)
 	{
-		$now = date('Y:m:d H:i:s');
 		$id_record = self::add_prestige_record(
 				get_current_user_id(),
 				null,
 				$id_officers,
 				$id_prestige_action,
-				$now,
+				$date,
 				$reward_amount,
 				$reward_type,
 				$reason

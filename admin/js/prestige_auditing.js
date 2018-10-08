@@ -202,7 +202,7 @@
 			day = ("0" + now.getDate()).slice(-2),
 			month = ("0" + (now.getMonth() + 1)).slice(-2),
 			year = now.getFullYear();
-		console.log($('#acting_office').val());
+		
 		let $form = $('#prestige_reward_form');
 		$('input[type=text]', $form).val('');
 		$('select', $form).val('');
@@ -235,7 +235,10 @@
 			data,
 			function(response)
 			{
-				console.log(response);
+				if(response.success)
+				{
+					$('#prestigeAddModalDialog').modal('hide');
+				}
 			}
 		);
 	}

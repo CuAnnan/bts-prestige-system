@@ -34,7 +34,7 @@
 				onSelectItemEvent: function()
 				{
 					let data = $autoComplete.getSelectedItemData();
-					$('#prestige_reward_id_users').val(data.id);
+					$('#prestige_reward_id_user').val(data.id);
 					$('#prestige_reward_first_name').val(data.first_name);
 					$('#prestige_reward_last_name').val(data.last_name);
 					$('#prestige_reward_membership_number').val(data.membership_number);
@@ -86,6 +86,7 @@
 	function buildPrestigeModal()
 	{
 		populateSelect('#prestige_reward_id_prestige_categories', prestigeCategories, 'name', populateActions);
+		populateSelect('#prestige_reward_id_officers', offices.filter((office)=>office.id_users == user_id), 'title');
 	}
 	
 	function populateActions()
@@ -97,6 +98,7 @@
 	{
 		$('#prestige_record_note_btn').click(addPrestigeNote);
 		$('#addPrestigeReward').click(showPrestigeRewardModal);
+		$('#prestige_reward_form').submit(()=>{handleNewPrestigeReward(); return false;});
 		bindNotesButtons();
 	}
 	
@@ -196,16 +198,46 @@
 	
 	function showPrestigeRewardModal()
 	{
-		let $form = $('#newPrestigeRecordForm');
+		let now = new Date(),
+			day = ("0" + now.getDate()).slice(-2),
+			month = ("0" + (now.getMonth() + 1)).slice(-2),
+			year = now.getFullYear();
+		console.log($('#acting_office').val());
+		let $form = $('#prestige_reward_form');
 		$('input[type=text]', $form).val('');
 		$('select', $form).val('');
+		$('#prestige_reward_id_officers').val($('#acting_office').val());
+		$('#prestige_reward_amount').val('');
 		$('.prestige-type').removeClass('active');
 		$('#prestige_reward_open')
 			.prop('checked', true)
 			.closest('.prestige-type')
 			.addClass('active');
+		$('#prestige_reward_claim_date').val(`${year}-${month}-${day}`);
 		$('#prestigeAddModalDialog').modal('show');
 		
+	}
+	
+	function handleNewPrestigeReward()
+	{
+		let data = {
+			'action':'add_prestige_reward',
+			'id_users':$('#prestige_reward_id_user').val(),
+			'id_officers':$('#prestige_reward_id_officers').val(),
+			'id_prestige_actions':$('#prestige_reward_id_prestige_actions').val(),
+			'reason':$('#prestige_reward_reason').val(),
+			'prestige_amount':$('#prestige_reward_amount').val(),
+			'prestige_type':$('input[name=prestige_reward_type]').val(),
+			'date':$('#prestige_reward_claim_date').val()
+		};
+		$.post(
+			ajaxurl,
+			data,
+			function(response)
+			{
+				console.log(response);
+			}
+		);
 	}
 	
 })(jQuery);

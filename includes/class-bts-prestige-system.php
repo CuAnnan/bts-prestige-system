@@ -163,6 +163,7 @@ class Bts_Prestige_System {
 		$this->loader->add_action( 'wp_ajax_add_prestige_note',		$plugin_admin, 'add_prestige_note');
 		$this->loader->add_action( 'wp_ajax_add_prestige_record',	$plugin_admin, 'add_prestige_record');
 		$this->loader->add_action( 'wp_ajax_reset_permissions',		$plugin_admin, 'reset_permissions');
+		$this->loader->add_action( 'wp_ajax_add_prestige_reward',	$plugin_admin, 'add_prestige_reward');
 	}
 
 	/**

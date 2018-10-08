@@ -43,13 +43,20 @@
 				<h5 class="modal-title">Add Prestige Reward</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 			</div>
-			<form id="newPrestigeRecordForm">
+			<form id="prestige_reward_form">
 				<input type="hidden" id="prestige_reward_id_user"/>
 				<input type="hidden" id="prestige_reward_first_name"/>
 				<input type="hidden" id="prestige_reward_last_name"/>
 				<input type="hidden" id="prestige_reward_membership_number"/>
 				<div class="modal-body">
 					<div class="container">
+						<div class="form-group row">
+							<label class="col-form-label col-4" for="prestige_reward_id_officers">Acting office:</label>
+							<div class="col">
+								<select id="prestige_reward_id_officers" required></select>
+							</div>
+						</div>
+						
 						<div class="form-group row">
 							<label class="col-form-label col-4" for="prestige_reward_user_search">Member</label>
 							<div class="col">
@@ -91,9 +98,18 @@
 								</div>
 							</div>
 						</div>
+						<div class="form-group row">
+							<label class="col-form-label col-4" for="prestige_reward_claim_date">Date of Claim:</label>
+							<div class="col">
+								<input type="date" id="prestige_reward_claim_date" class="form-control"/>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class="modal-footer"></div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary" id="prestige_reward_submit_button">Add Record</button>
+					<button class="btn btn-warning" data-dismiss="modal">Cancel</button>
+				</div>
 			</form>
 		</div>
 	</div>

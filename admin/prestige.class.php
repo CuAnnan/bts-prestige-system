@@ -1,14 +1,11 @@
-<?php
-require_once (plugin_dir_path(__FILE__).'class-bts-prestige-system-domains.php');
-require_once (plugin_dir_path(__FILE__).'class-bts-prestige-system-offices.php');
-require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-users.php';	
+<?php namespace BTS_Prestige\Admin;
 
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-class Bts_Prestige_System_Prestige
+class Prestige
 {
 	protected static $memberClasses = [
 		["title"=>"Associate",	"level"=>1,		"prestige"=>50],
@@ -49,7 +46,7 @@ class Bts_Prestige_System_Prestige
 	
 	public static function add_prestige_reward($id_users, $id_officers, $id_prestige_action, $reward_amount, $reward_type, $reason, $status, $date)
 	{
-		$user = new WP_User(get_current_user_id());
+		$user = new \WP_User(get_current_user_id());
 		if(!array_intersect(['admin', BTS_PRESTIGE_MANAGEMENT_ROLE], (array)$user->roles))
 		{
 			return ['success'=>false, "error"=>'Permission error'];
@@ -64,6 +61,7 @@ class Bts_Prestige_System_Prestige
 				$reward_amount,
 				$reward_type
 		);
+		
 		if($id_record)
 		{
 			$id_note = self::add_record_note($id_record, get_current_user_id(), $reason, $date, $status, $id_officers);
@@ -169,7 +167,7 @@ class Bts_Prestige_System_Prestige
 	public static function cooerce_record_to_object($record)
 	{
 		$basic_fields = ["id", "officer_id_user", "member_id_user", "reward_amount", "reward_type", "date_claimed", "description", "category", "officer_title", "domain_name", "genre_name", "status"];
-		$ordered_record = new stdClass();
+		$ordered_record = new \stdClass();
 		$ordered_record->notes = [];
 		foreach($basic_fields as $basic_field)
 		{
@@ -182,7 +180,7 @@ class Bts_Prestige_System_Prestige
 	public static function cooerce_record_to_note_object($record)
 	{
 		$note_fields = ["note", "note_officer_title", "note_domain_name", "note_genre_name", "note_status", "note_date"];
-		$note_object = new stdClass();
+		$note_object = new \stdClass();
 		foreach($note_fields as $note_field)
 		{
 			$note_object->$note_field = $record->$note_field;
@@ -327,9 +325,9 @@ class Bts_Prestige_System_Prestige
 		$prestige_rewards		= self::get_prestige_for_user_by_id(get_current_user_id());
 		$prestige_categories	= self::get_prestige_categories();
 		$prestige_actions		= self::get_prestige_actions();
-		$domains				= Bts_Prestige_System_Domains::get_all_domains();
-		$offices				= Bts_Prestige_System_Offices::get_all_active_offices();
-		$venues					= Bts_Prestige_System_Venues::get_all_active_venues();
+		$domains				= \BTS_Prestige\Admin\Domains::get_all_domains();
+		$offices				= \BTS_Prestige\Admin\Offices::get_all_active_offices();
+		$venues					= \BTS_Prestige\Admin\Venues::get_all_active_venues();
 		$audited_prestige		= self::get_audited_prestige(get_current_user_id());
 		
 		$mc						= self::get_mc($audited_prestige);
@@ -348,11 +346,12 @@ class Bts_Prestige_System_Prestige
 		$prestige_records	= self::fetch_prestige_entries_requiring_action();
 		$prestige_categories	= self::get_prestige_categories();
 		$prestige_actions		= self::get_prestige_actions();
-		$domains				= Bts_Prestige_System_Domains::get_all_domains();
-		$offices				= Bts_Prestige_System_Offices::get_all_active_offices();
-		$venues					= Bts_Prestige_System_Venues::get_all_active_venues();
 		$can_audit				= array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles);
-		$usersMetaData			= Bts_Prestige_System_Users::getUsermeta();
+		
+		$domains				= \BTS_Prestige\Admin\Domains::get_all_domains();
+		$offices				= \BTS_Prestige\Admin\Offices::get_all_active_offices();
+		$venues					= \BTS_Prestige\Admin\Venues::get_all_active_venues();
+		$usersMetaData			= \BTS_Prestige\Admin\Users::getUsermeta();
 		
 		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-auditing.php');
 	}

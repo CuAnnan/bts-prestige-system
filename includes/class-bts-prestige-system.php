@@ -77,8 +77,7 @@ class Bts_Prestige_System {
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
-		$this->define_public_hooks();
-
+		
 	}
 
 	/**
@@ -111,17 +110,6 @@ class Bts_Prestige_System {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-bts-prestige-system-i18n.php';
 
-		/**
-		 * The class responsible for defining all actions that occur in the admin area.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-bts-prestige-system-admin.php';
-
-		/**
-		 * The class responsible for defining all actions that occur in the public-facing
-		 * side of the site.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-bts-prestige-system-public.php';
-
 		$this->loader = new Bts_Prestige_System_Loader();
 
 	}
@@ -152,7 +140,7 @@ class Bts_Prestige_System {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Bts_Prestige_System_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new \BTS_Prestige\Admin\Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts',			$plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts',			$plugin_admin, 'enqueue_scripts' );
@@ -166,23 +154,6 @@ class Bts_Prestige_System {
 		$this->loader->add_action( 'wp_ajax_add_prestige_reward',	$plugin_admin, 'add_prestige_reward');
 	}
 
-	/**
-	 * Register all of the hooks related to the public-facing functionality
-	 * of the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	private function define_public_hooks() {
-
-		$plugin_public = new Bts_Prestige_System_Public( $this->get_plugin_name(), $this->get_version() );
-
-		$this->loader->add_action( 'wp_enqueue_scripts',		$plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts',		$plugin_public, 'enqueue_scripts' );
-		$this->loader->add_action( 'user_register',				$plugin_public, 'post_register_action' );
-		$this->add_profile_functions($plugin_public);
-	}
-	
 	/**
 	 * Add the profile action hooks
 	 * @param	type $plugin_public	The plugin class reference

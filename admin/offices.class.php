@@ -1,8 +1,6 @@
-<?php
-require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-domains.php';
-require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-venues.php';
+<?php namespace BTS_Prestige\Admin;
 
-class Bts_Prestige_System_Offices
+class Offices
 {
 	/**
 	 * 
@@ -109,7 +107,7 @@ class Bts_Prestige_System_Offices
 		
 		if($office_count == 1)
 		{
-			$user = new WP_User($id_users);
+			$user = new \WP_User($id_users);
 			$user->remove_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
 			$user->remove_cap(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
 		}
@@ -129,7 +127,7 @@ class Bts_Prestige_System_Offices
 		
 		if($office_count == 1)
 		{
-			$user = new WP_User($id_users);
+			$user = new \WP_User($id_users);
 			$user->remove_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
 			$user->remove_cap(BTS_PRESTIGE_MANAGEMENT_ROLE);
 		}
@@ -137,14 +135,14 @@ class Bts_Prestige_System_Offices
 	
 	public static function add_domain_coordinator_role($id_users)
 	{
-		$user = new WP_User($id_users);
+		$user = new \WP_User($id_users);
 		$user->add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
 		$user->add_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
 	}
 	
 	public static function add_venue_coordinator_role($id_users)
 	{
-		$user = new WP_User($id_users);
+		$user = new \WP_User($id_users);
 		$user->add_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
 	}
 	
@@ -208,12 +206,8 @@ class Bts_Prestige_System_Offices
 	
 	public static function add_national_office_role($id_users)
 	{
-		$user = new WP_User($id_users);
-		error_log('Trying to add role '.BTS_NATIONAL_OFFICE_ROLE." to ".$id_users);
+		$user = new \WP_User($id_users);
 		$user->add_role(BTS_NATIONAL_OFFICE_ROLE);
-		
-		error_log($id_users);
-		error_log(print_r($user->roles, true));
 	}
 	
 	/**

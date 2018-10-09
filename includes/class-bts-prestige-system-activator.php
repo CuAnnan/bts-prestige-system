@@ -54,7 +54,7 @@ class Bts_Prestige_System_Activator {
 		$national_officer_role = add_role(BTS_NATIONAL_OFFICE_ROLE, 'National Officer');
 		$national_officer_role->add_cap(BTS_NATIONAL_OFFICE_PERM);
 		
-		$admin = new WP_User(1);
+		$admin = new \WP_User(1);
 		$admin->add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
 		$admin->add_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
 		

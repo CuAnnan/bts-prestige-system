@@ -1,6 +1,6 @@
-<?php
+<?php namespace BTS_Prestige\Admin;
 
-class Bts_Prestige_System_Users
+class Users
 {
 	public static function getUsermeta()
 	{

@@ -1,6 +1,6 @@
-<?php
+<?php namespace BTS_Prestige\Admin;
 
-class Bts_Prestige_System_Venues
+class Venues
 {
 	public static function get_managed_venues_for_id_users($id_users)
 	{

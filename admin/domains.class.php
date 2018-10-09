@@ -1,15 +1,6 @@
-<?php
+<?php namespace BTS_Prestige\Admin;
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-offices.php';
-require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-genres.php';
-require_once plugin_dir_path(__FILE__).'class-bts-prestige-system-users.php';
-
-class Bts_Prestige_System_Domains
+class Domains
 {
 	public static function get_managed_domains_for_id_users($id_users)
 	{
@@ -88,9 +79,9 @@ class Bts_Prestige_System_Domains
 	public static function show_domain_management_page()
 	{
 		$managed_domains = self::get_managed_domains();
-		$officers		= Bts_Prestige_System_Offices::get_offices_by_id_domains($managed_domains);
-		$genres			= Bts_Prestige_System_Genres::get_genres();
-		$usersMetaData	= Bts_Prestige_System_Users::getUsermeta();
+		$officers		= \BTS_Prestige\Admin\Offices::get_offices_by_id_domains($managed_domains);
+		$genres			= \BTS_Prestige\Admin\Genres::get_genres();
+		$usersMetaData	= \BTS_Prestige\Admin\Users::getUsermeta();
 		require_once plugin_dir_path(__FILE__).'/partials/bts-prestige-system-management-page.php';
 	}
 }

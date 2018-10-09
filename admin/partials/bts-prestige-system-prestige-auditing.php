@@ -98,6 +98,20 @@
 								</div>
 							</div>
 						</div>
+						<div class="btn-group btn-group-toggle" data-toggle="buttons">
+							<label class="prestige-reward-approved btn btn-secondary active">
+								<input type="radio" name="prestige_reward_approved" id="prestige_reward_approve_submitted" value="Submitted"/> Submitted
+							</label>
+							<label class="prestige-reward-approved btn btn-secondary">
+								<input type="radio" name="prestige_reward_approved" id="prestige_reward_approved_approved" value="Approved"/> Approved
+							</label>
+							<?php if($can_audit) { ?>
+							<label class="prestige-reward-approved btn btn-secondary">
+								<input type="radio" name="prestige_reward_approved" id="prestige_reward_approved_audited" value="Audited"/> Audited
+							</label>
+							<?php } ?>
+						</div>
+						
 						<div class="form-group row">
 							<label class="col-form-label col-4" for="prestige_reward_claim_date">Date of Claim:</label>
 							<div class="col">

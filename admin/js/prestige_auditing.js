@@ -213,6 +213,11 @@
 			.prop('checked', true)
 			.closest('.prestige-type')
 			.addClass('active');
+		$('.prestige-reward-approved').removeClass('active');
+		$('#prestige_reward_approve_submitted')
+			.prop('checked', true)
+			.closest('.prestige-reward-approved')
+			.addClass('active');
 		$('#prestige_reward_claim_date').val(`${year}-${month}-${day}`);
 		$('#prestigeAddModalDialog').modal('show');
 		
@@ -228,6 +233,7 @@
 			'reason':$('#prestige_reward_reason').val(),
 			'prestige_amount':$('#prestige_reward_amount').val(),
 			'prestige_type':$('input[name=prestige_reward_type]').val(),
+			'status':$('input[name=prestige_reward_approved]').val(),
 			'date':$('#prestige_reward_claim_date').val()
 		};
 		$.post(

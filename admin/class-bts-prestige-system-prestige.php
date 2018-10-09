@@ -47,15 +47,13 @@ class Bts_Prestige_System_Prestige
 		return ['success'=>false];
 	}
 	
-	public static function add_prestige_reward($id_users, $id_officers, $id_prestige_action, $reward_amount, $reward_type, $reason, $date)
+	public static function add_prestige_reward($id_users, $id_officers, $id_prestige_action, $reward_amount, $reward_type, $reason, $status, $date)
 	{
 		$user = new WP_User(get_current_user_id());
 		if(!array_intersect(['admin', BTS_PRESTIGE_MANAGEMENT_ROLE], (array)$user->roles))
 		{
 			return ['success'=>false, "error"=>'Permission error'];
 		}
-		
-		error_log("Trying to add reward. $id_users, $id_officers, $id_prestige_action, $reward_amount, $reward_type, $reason, $date");
 		
 		$id_record = self::add_prestige_record(
 				$id_users,
@@ -64,12 +62,16 @@ class Bts_Prestige_System_Prestige
 				$id_prestige_action,
 				$date,
 				$reward_amount,
-				$reward_type,
-				$reason
+				$reward_type
 		);
 		if($id_record)
 		{
-			return ['success'=>true, "id_record"=>$id_record, 'date'=>$date];
+			$id_note = self::add_record_note($id_record, get_current_user_id(), $reason, $date, $status, $id_officers);
+			if($id_note)
+			{
+				return ['success'=>true, "id_record"=>$id_record, 'date'=>$date];
+			}
+			return ['success'=>false];
 		}
 		return ['success'=>false];
 	}

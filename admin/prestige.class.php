@@ -53,13 +53,13 @@ class Prestige
 		}
 		
 		$id_record = self::add_prestige_record(
-				$id_users,
-				get_current_user_id(),
-				$id_officers,
-				$id_prestige_action,
-				$date,
-				$reward_amount,
-				$reward_type
+			$id_users,
+			get_current_user_id(),
+			$id_officers,
+			$id_prestige_action,
+			$date,
+			$reward_amount,
+			$reward_type
 		);
 		
 		if($id_record)
@@ -72,6 +72,12 @@ class Prestige
 			return ['success'=>false];
 		}
 		return ['success'=>false];
+	}
+	
+	public static function fetch_user_prestige($id_users)
+	{
+		$logged_in_user_domains = Domains::get_managed_domain_ids(get_current_user_id);
+		
 	}
 	
 	public static function add_prestige_record($id_users, $id_member_approved, $id_officer_approved, $id_prestige_action, $date_claimed, $reward_amount, $reward_type, $reason = null)

@@ -76,6 +76,7 @@ class Bts_Prestige_System {
 
 		$this->load_dependencies();
 		$this->set_locale();
+		$this->define_public_hooks();
 		$this->define_admin_hooks();
 		
 	}
@@ -152,6 +153,14 @@ class Bts_Prestige_System {
 		$this->loader->add_action( 'wp_ajax_add_prestige_record',	$plugin_admin, 'add_prestige_record');
 		$this->loader->add_action( 'wp_ajax_reset_permissions',		$plugin_admin, 'reset_permissions');
 		$this->loader->add_action( 'wp_ajax_add_prestige_reward',	$plugin_admin, 'add_prestige_reward');
+	}
+	
+	private function define_public_hooks() {
+		$plugin_public = new \BTS_Prestige\Front\Front( $this->get_plugin_name(), $this->get_version() );
+		$this->loader->add_action( 'wp_enqueue_scripts',		$plugin_public, 'enqueue_styles' );
+		$this->loader->add_action( 'wp_enqueue_scripts',		$plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'user_register',				$plugin_public, 'post_register_action' );
+		$this->add_profile_functions($plugin_public);
 	}
 
 	/**

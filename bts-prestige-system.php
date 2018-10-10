@@ -95,10 +95,8 @@ function run_bts_prestige_system() {
 spl_autoload_register(
 	function($className)
 	{
-	
 		$parts = explode("\\", $className);
 		array_shift($parts);
-		
 		$absolutePath = plugin_dir_path(__FILE__).strtolower(join("/", $parts)).".class.php";
 		require_once ($absolutePath);
 	}

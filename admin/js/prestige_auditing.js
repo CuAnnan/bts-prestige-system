@@ -31,7 +31,7 @@
 				match: {
 					enabled: true
 				},
-				onSelectItemEvent: function()
+				onClickEvent: function()
 				{
 					let data = $autoComplete.getSelectedItemData();
 					$('#prestige_reward_id_user').val(data.id);

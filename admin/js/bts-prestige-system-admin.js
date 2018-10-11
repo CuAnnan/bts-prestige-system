@@ -49,7 +49,7 @@
 				match: {
 					enabled: true
 				},
-				onSelectItemEvent: function()
+				onClickEvent: function()
 				{
 					let data = $autoComplete.getSelectedItemData();
 					$('#office_edit_id_users').val(data.id);

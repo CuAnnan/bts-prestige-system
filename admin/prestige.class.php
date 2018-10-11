@@ -76,7 +76,7 @@ class Prestige
 	
 	public static function fetch_user_prestige($id_users)
 	{
-		$logged_in_user_domains = Domains::get_managed_domain_ids(get_current_user_id);
+		$logged_in_user_domains = Domains::get_managed_domain_ids(get_current_user_id());
 		$user_id_domains = get_user_meta($id_users, 'id_domains', true);
 		if(!in_array($user_id_domains, $logged_in_user_domains))
 		{

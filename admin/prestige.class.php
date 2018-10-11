@@ -77,7 +77,13 @@ class Prestige
 	public static function fetch_user_prestige($id_users)
 	{
 		$logged_in_user_domains = Domains::get_managed_domain_ids(get_current_user_id);
+		$user_id_domains = get_user_meta($id_users, 'id_domains', true);
+		if(!in_array($user_id_domains, $logged_in_user_domains))
+		{
+			return ['success'=>false, 'error'=>'This user is not in a domain you manage'];
+		}
 		
+		return ['success'=>true, 'log'=>self::get_prestige_for_user_by_id($id_users)];
 	}
 	
 	public static function add_prestige_record($id_users, $id_member_approved, $id_officer_approved, $id_prestige_action, $date_claimed, $reward_amount, $reward_type, $reason = null)
@@ -342,9 +348,11 @@ class Prestige
 		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-management-page.php');
 	}
 	
-	public static function fetch_managed_prestige_logs()
+	public static function view_prestige_page()
 	{
-		
+		$managed_domains		= Domains::get_managed_domain_ids();
+		$users					= Users::get_users_by_id_domains($managed_domains);
+		require_once (plugin_dir_path(__FILE__).'partials/prestige-search-page.php');
 	}
 	
 	public static function show_prestige_auditing_page()

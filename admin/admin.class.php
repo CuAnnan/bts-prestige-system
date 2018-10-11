@@ -123,12 +123,25 @@ class Admin
 	
 	public function audit_prestige()
 	{
-		add_menu_page(
+		add_submenu_page(
+			'bts_prestige_log',
 			'Prestige Audit',
 			'Prestige Audit',
 			BTS_PRESTIGE_MANAGEMENT_ROLE,
 			'bts_prestige_audit',
 			array($this, 'audit_prestige_page')
+		);
+	}
+	
+	public function view_prestige()
+	{
+		add_submenu_page(
+			'bts_prestige_log',
+			'Prestige Log Search',
+			'Prestige Log Search',
+			BTS_PRESTIGE_MANAGEMENT_ROLE,
+			'bts_prestige_view',
+			array($this, 'view_prestige_page')
 		);
 	}
 	
@@ -151,24 +164,30 @@ class Admin
 		Prestige::show_prestige_management_page();
 	}
 	
+	public function view_prestige_page()
+	{
+		wp_enqueue_style($this->plugin_name.'admin', plugin_dir_url( __FILE__ ) . 'css/easy-autocomplete.min.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name.'view_prestige', plugin_dir_url(__FILE__).'css/prestige_log_search.css', array(), $this->version, 'all');
+		wp_enqueue_script($this->plugin_name.'autocomplete', plugin_dir_url( __FILE__ ) . 'js/jquery.easy-autocomplete.min.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name.'view_prestige', plugin_dir_url(__FILE__).'js/prestige_log_search.js', array('jquery'), $this->version, false);
+		Prestige::view_prestige_page();
+	}
+	
 	public function add_prestige_note()
 	{
-		header("Content-type: text/json");
-		echo json_encode(\BTS_Prestige\Admin\Prestige::try_to_add_record_note(
+		$this->return_json(\BTS_Prestige\Admin\Prestige::try_to_add_record_note(
 			filter_input(INPUT_POST, 'id_prestige_record'),
 			filter_input(INPUT_POST, 'note_text'),
 			filter_input(INPUT_POST, 'status'),
 			filter_input(INPUT_POST, 'id_acting_officer')
 		));
-		exit();
 	}
 	
 	public function add_prestige_record()
 	{
-		header("Content-type: text/json");
-		// signature of the method
-		
-		echo json_encode(\BTS_Prestige\Admin\Prestige::add_prestige_claim(
+		$this->return_json(\BTS_Prestige\Admin\Prestige::add_prestige_claim(
 			filter_input(INPUT_POST, 'id_officers'),
 			filter_input(INPUT_POST, 'id_prestige_actions'),
 			filter_input(INPUT_POST, 'prestige_amount'),
@@ -176,14 +195,11 @@ class Admin
 			filter_input(INPUT_POST, 'reason'),
 			filter_input(INPUT_POST, 'date')
 		));
-		exit();
 	}
 	
 	public function add_prestige_reward()
 	{
-		header('Content-type: text/json');
-		
-		$json = json_encode(\BTS_Prestige\Admin\Prestige::add_prestige_reward(
+		$this->return_json(\BTS_Prestige\Admin\Prestige::add_prestige_reward(
 			filter_input(INPUT_POST, 'id_users'),
 			filter_input(INPUT_POST, 'id_officers'),
 			filter_input(INPUT_POST, 'id_prestige_actions'),
@@ -193,27 +209,33 @@ class Admin
 			filter_input(INPUT_POST, 'status'),
 			filter_input(INPUT_POST, 'date')
 		));
-		
-		echo ($json);
-		exit();
 	}
 	
 	public function update_office()
 	{
-		header("Content-type: text/json");
-		echo json_encode(\BTS_Prestige\Admin\Offices::update_office(
+		$this->return_json(\BTS_Prestige\Admin\Offices::update_office(
 			filter_input(INPUT_POST, 'id_domains'),
 			filter_input(INPUT_POST, 'id'),
 			$_POST
 		));
-		exit();
 	}
 	
 	public function reset_permissions()
 	{
-		header("Content-type: text/json");
-		echo json_encode(\BTS_Prestige\Admin\Offices::update_office_roles());
-		exit();
+		$this->return_json(\BTS_Prestige\Admin\Offices::update_office_roles());
 	}
 	
+	public function fetch_user_prestige()
+	{
+		$this->return_json(\BTS_Prestige\Admin\Prestige::fetch_user_prestige(
+			filter_input(INPUT_POST, 'id_users')
+		));
+	}
+	
+	public function return_json($array)
+	{
+		header("Content-type: text/json");
+		echo json_encode($array);
+		exit();
+	}
 }

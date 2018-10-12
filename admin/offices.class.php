@@ -133,17 +133,28 @@ class Offices
 		}
 	}
 	
-	public static function add_domain_coordinator_role($id_users)
+	public static function add_domain_coordinator_roles($id_users)
 	{
-		$user = new \WP_User($id_users);
-		$user->add_role(BTS_MANAGE_CLUB_STRUCTURE_ROLE);
-		$user->add_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
+		self::add_roles($id_users, [BTS_MANAGE_CLUB_STRUCTURE_ROLE, BTS_PRESTIGE_MANAGEMENT_ROLE]);
 	}
 	
-	public static function add_venue_coordinator_role($id_users)
+	public static function add_officer_roles($id_users)
+	{
+		self::add_roles($id_users, BTS_PRESTIGE_MANAGEMENT_ROLE);
+	}
+	
+	public static function add_national_office_role($id_users)
+	{
+		self::add_roles($id_users, BTS_NATIONAL_OFFICE_ROLE);
+	}
+	
+	public static function add_roles($id_users, $roles)
 	{
 		$user = new \WP_User($id_users);
-		$user->add_role(BTS_PRESTIGE_MANAGEMENT_ROLE);
+		foreach($roles as $role)
+		{
+			$user->add_role($role);
+		}
 	}
 	
 	public static function get_domain_coordinator_user_id($id_domains)
@@ -171,16 +182,16 @@ class Offices
 		if($domain_coordinator->id_users !== $id_users)
 		{
 			self::remove_manage_club_structure_role($domain_coordinator->id_users);
-			self::add_domain_coordinator_role($id_users);
+			self::add_domain_coordinator_roles($id_users);
 		}
 	}
 	
-	public static function check_venue_coordinator_permissions($office, $id_users)
+	public static function check_officer_roles($office, $id_users)
 	{
 		if($office->id_users !== $id_users)
 		{
 			self::remove_prestige_management_role($id_users);
-			self::add_venue_coordinator_role($id_users);
+			self::add_officer_roles($id_users);
 		}
 	}
 	
@@ -188,6 +199,7 @@ class Offices
 	{
 		$officer->isVC = $officer->chain == 'Coordinator' && $officer->id_superior == null && $officer->id_venues != null;
 		$officer->isDC = $officer->chain == 'Coordinator' && $officer->id_superior == null && $officer->id_venues == null;
+		$officer->isOfficer = $officer->id_superior == null && $officer->id_venues == null;
 	}
 	
 	public static function get_officer_by_id($id_officers)
@@ -202,12 +214,6 @@ class Offices
 		);
 		self::add_office_position_fileds($officer);
 		return $officer;
-	}
-	
-	public static function add_national_office_role($id_users)
-	{
-		$user = new \WP_User($id_users);
-		$user->add_role(BTS_NATIONAL_OFFICE_ROLE);
 	}
 	
 	/**
@@ -232,7 +238,7 @@ class Offices
 		}
 		else if($office->isVC)
 		{
-			self::check_venue_coordinator_permissions($office, $id_users);
+			self::check_officer_roles($office, $id_users);
 		}
 		
 	}
@@ -301,7 +307,7 @@ class Offices
 	public static function reset_office_roles()
 	{
 		$offices = self::get_all_top_level_positions();
-		self::add_domain_coordinator_role(1);
+		self::add_domain_coordinator_roles(1);
 		foreach($offices as $office)
 		{
 			self::add_office_position_fileds($office);
@@ -311,11 +317,11 @@ class Offices
 			}
 			if($office->isDC)
 			{
-				self::add_domain_coordinator_role($office->id_users);
+				self::add_domain_coordinator_roles($office->id_users);
 			}
 			else if($office->isVC)
 			{
-				self::add_venue_coordinator_role($office->id_users);
+				self::add_officer_roles($office->id_users);
 			}
 		}
 	}

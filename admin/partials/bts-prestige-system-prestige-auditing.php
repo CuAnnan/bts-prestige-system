@@ -167,10 +167,13 @@
 											<input type="radio" name="prestige_record_approved" id="option2" value="Approved"/> Approved
 										</label>
 										<?php if($can_audit) { ?>
-										<label class="prestige-record-approved btn btn-secondary">
-											<input type="radio" name="prestige_record_approved" id="option3" value="Audited"/> Audited
-										</label>
+											<label class="prestige-record-approved btn btn-secondary">
+												<input type="radio" name="prestige_record_approved" id="option3" value="Audited"/> Audited
+											</label>
 										<?php } ?>
+										<label class="prestige-record-approved btn btn-danger">
+											<input type="radio" name="prestige_record_approved" id="prestige_record_approved_rejected" value="Rejected"/> Rejected
+										</label>
 									</div>
 								</td>
 								<td>

@@ -183,7 +183,7 @@
 			data,
 			function(response)
 			{
-				if(data.status === 'Audited')
+				if(data.status === 'Audited' || data.status === 'Rejected')
 				{
 					$dtRow.remove().draw();
 				}

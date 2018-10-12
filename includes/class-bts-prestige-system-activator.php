@@ -162,7 +162,7 @@ class Bts_Prestige_System_Activator {
 				"date_claimed datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 				"reward_amount int UNSIGNED NOT NULL",
 				'reward_type ENUM("Open", "Regional", "National") DEFAULT "Open"',
-				'status enum("Submitted", "Approved", "Audited") DEFAULT "Submitted"',
+				'status enum("Submitted", "Approved", "Audited", "Rejected") DEFAULT "Submitted"',
 				'PRIMARY KEY  (id)',
 				"FOREIGN KEY (id_member) REFERENCES {$wpdb->prefix}users(ID)",
 				"FOREIGN KEY (id_member_approved) REFERENCES {$wpdb->prefix}users(ID)",

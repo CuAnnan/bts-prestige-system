@@ -409,7 +409,7 @@ class Prestige
 				LEFT JOIN	{$prefix}domains dn					ON (dn.id	= n_o.id_domains)
 				LEFT JOIN	{$prefix}genres dg					ON (dg.id	= vn.id_genres)
 			WHERE
-				pr.status  != 'Audited'";
+				pr.status  IN ('Submitted', 'Approved')";
 		
 		if(!array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles))
 		{

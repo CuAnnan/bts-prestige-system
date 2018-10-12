@@ -185,7 +185,6 @@ class Prestige
 		{
 			$ordered_record->$basic_field = $record->$basic_field;
 		}
-		
 		return $ordered_record;
 	}
 	

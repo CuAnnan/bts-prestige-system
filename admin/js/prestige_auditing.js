@@ -132,11 +132,20 @@
 				{data:'status'},
 				{data:null, orderable:false, defaultContent:`<button class="btn btn-primary prestige-note-button">Notes</button>`}
 			],
+			columnDefs:[
+				{
+					targets:5,
+					render:function(data, type, row)
+					{
+						return data.split(" ")[0];
+					}
+				}
+			],
 			createdRow:function(row, data, dataIndex)
 			{
 				$(row).data({notes:data.notes, id:data.id});
 			},
-			order:[[4, 'desc']]
+			order:[[5, 'desc']]
 		});
 	}
 	

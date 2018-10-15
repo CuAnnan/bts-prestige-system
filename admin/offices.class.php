@@ -155,7 +155,6 @@ class Offices
 		{
 			$user->add_role($role);
 		}
-		error_log(print_r($user, true));
 	}
 	
 	public static function get_domain_coordinator_user_id($id_domains)

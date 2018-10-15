@@ -82,15 +82,24 @@
 							</div>
 						</div>
 						<div class="form-group row">
-							<label class="col-form-label col-4" for="id_domains" required>Domain</label>
-							<div class="col"><select class="form-control" id="id_domains"></select></div>
+							<label class="col-form-label col-4" for="chain">Chain</label>
+							<div class="col">
+								<select class="form-control" id="chain">
+									<option>Coordinator</option>
+									<option>Storyteller</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label class="col-form-label col-4" for="id_domains">Domain</label>
+							<div class="col"><select class="form-control" id="id_domains" required></select></div>
 						</div>
 						<div class="form-group row">
 							<label class="col-form-label col-4" for="id_venues">Venue</label>
 							<div class="col">
 								<select class="form-control" id="id_venues"></select>
 								<small class="form-text text-muted">
-									To claim prestige from the DC, leave the venue blank.
+									To claim prestige from the Domain Officer, leave the venue blank.
 								</small>
 							</div>
 						</div>

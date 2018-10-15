@@ -140,12 +140,12 @@ class Offices
 	
 	public static function add_officer_roles($id_users)
 	{
-		self::add_roles($id_users, BTS_PRESTIGE_MANAGEMENT_ROLE);
+		self::add_roles($id_users, [BTS_PRESTIGE_MANAGEMENT_ROLE]);
 	}
 	
 	public static function add_national_office_role($id_users)
 	{
-		self::add_roles($id_users, BTS_NATIONAL_OFFICE_ROLE);
+		self::add_roles($id_users, [BTS_MANAGE_CLUB_STRUCTURE_ROLE, BTS_PRESTIGE_MANAGEMENT_ROLE, BTS_NATIONAL_OFFICE_ROLE]);
 	}
 	
 	public static function add_roles($id_users, $roles)
@@ -155,6 +155,7 @@ class Offices
 		{
 			$user->add_role($role);
 		}
+		error_log(print_r($user, true));
 	}
 	
 	public static function get_domain_coordinator_user_id($id_domains)
@@ -197,9 +198,8 @@ class Offices
 	
 	public static function add_office_position_fileds($officer)
 	{
-		$officer->isVC = $officer->chain == 'Coordinator' && $officer->id_superior == null && $officer->id_venues != null;
 		$officer->isDC = $officer->chain == 'Coordinator' && $officer->id_superior == null && $officer->id_venues == null;
-		$officer->isOfficer = $officer->id_superior == null && $officer->id_venues == null;
+		$officer->isOfficer = $officer->id_superior == null;
 	}
 	
 	public static function get_officer_by_id($id_officers)
@@ -236,7 +236,7 @@ class Offices
 		{
 			self::check_domain_coordinator_permissions($office, $id_users);
 		}
-		else if($office->isVC)
+		else if($office->isOfficer)
 		{
 			self::check_officer_roles($office, $id_users);
 		}
@@ -319,7 +319,7 @@ class Offices
 			{
 				self::add_domain_coordinator_roles($office->id_users);
 			}
-			else if($office->isVC)
+			else if($office->isOfficer)
 			{
 				self::add_officer_roles($office->id_users);
 			}

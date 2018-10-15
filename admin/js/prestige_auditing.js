@@ -13,12 +13,75 @@
 	
 	$(function(){
 		parseJSONElements();
-		buildDataTable();
+		buildOfficeTabs();
 		buildPrestigeModal();
-		populateSelect('#acting_office', offices.filter((office)=>office.id_users == user_id), 'title');
 		buildUserAutoComplete();
 		bindEvents();
 	});
+	
+	function buildOfficeTabs()
+	{
+		let recordsByOffice = {},
+			$recordsNav = $('#recordsNav'),
+			$recordsTabs = $('#recordsTabs'),
+			firstRecord = true;
+		for(let record of prestigeRecords)
+		{
+			let office = offices.filter((office)=>office.id === record.id_officers)[0];
+			if(!recordsByOffice[office.id])
+			{
+				recordsByOffice[office.id] = {office:office,records:[]};
+			}
+			recordsByOffice[office.id].records.push(record);
+		}
+		
+		for(let record of Object.values(recordsByOffice))
+		{
+			let domain = domains.filter((domain)=>domain.id == record.office.id_domains)[0],
+				officeAndDomain = record.office.title + ' ' + domain.name,
+				idPrefix = officeAndDomain.replace(/\s/g, '-'),
+				$tabNav = $(`<li class="nav-item"><a class="nav-link" id="${idPrefix}-tab" data-toggle="tab" href="#${idPrefix}" role="tab" aria-controls="profile" aria-selected="${firstRecord}">${officeAndDomain}</a></li>`).appendTo($recordsNav),
+				$tabContent = $(`<div class="tab-pane fade" id="${idPrefix}" role="tabpanel" aria-labelledby="nav-profile-tab"></div>`).appendTo($recordsTabs),
+				$dataTableContainer = $(`<table id="${idPrefix}_prestige_table"><thead><tr><th>Member</th><th>Action</th><th>Category</th><th>Amount</th><th>Type</th><th>Date Claimed</th><th>Awarding Officer</th><th>Domain</th><th>Venue</th><th>Approved</th><th>&nbsp;</th></tr></thead><tbody></tbody></table>`);
+				$dataTableContainer.appendTo($tabContent),
+				$dataTable = buildTabDataTable($dataTableContainer, record);
+				
+			if(firstRecord)
+			{
+				$('a', $tabNav).addClass('active');
+				$tabContent.addClass('active').addClass('show');
+			}
+			firstRecord = false;
+		}
+	}
+	
+	function buildTabDataTable($dataTableContainer, record)
+	{
+		let user = (data)=> {return `${data.first_name} ${data.last_name} (${data.number})`;};
+		$dataTable = $dataTableContainer.DataTable({
+			data:record.records,
+			autoWidth:false,
+			columns:[
+				{data:user},
+				{data:'description'},
+				{data:'category'},
+				{data:'reward_amount'},
+				{data:'reward_type'},
+				{data:'date_claimed'},
+				{data:'officer_title'},
+				{data:'domain_name'},
+				{data:'genre_name'},
+				{data:'status'},
+				{data:null, orderable:false, defaultContent:`<button class="btn btn-primary prestige-note-button">Notes</button>`}
+			],
+			createdRow:function(row, data, dataIndex)
+			{
+				$(row).data({notes:data.notes, id:data.id});
+			},
+			order:[[4, 'desc']]
+		});
+		return $dataTable;
+	}
 	
 	function buildUserAutoComplete()
 	{
@@ -107,48 +170,6 @@
 		$('.prestige-note-button').off().click(showNotes);
 	}
 	
-	function buildDataTable()
-	{
-		/*
-		 * A function to concatenate the user's firstname, last name, and membership number
-		 */
-		let user = (data)=>
-		{
-			return `${data.first_name} ${data.last_name} (${data.number})`;
-		};
-		
-		$dataTable = $('#prestige_record_table').DataTable({
-			data:prestigeRecords,
-			columns:[
-				{data:user},
-				{data:'description'},
-				{data:'category'},
-				{data:'reward_amount'},
-				{data:'reward_type'},
-				{data:'date_claimed'},
-				{data:'officer_title'},
-				{data:'domain_name'},
-				{data:'genre_name'},
-				{data:'status'},
-				{data:null, orderable:false, defaultContent:`<button class="btn btn-primary prestige-note-button">Notes</button>`}
-			],
-			columnDefs:[
-				{
-					targets:5,
-					render:function(data, type, row)
-					{
-						return data.split(" ")[0];
-					}
-				}
-			],
-			createdRow:function(row, data, dataIndex)
-			{
-				$(row).data({notes:data.notes, id:data.id});
-			},
-			order:[[5, 'desc']]
-		});
-	}
-	
 	function showNotes()
 	{
 		let $button = $(this);
@@ -180,8 +201,7 @@
 				'action':				'add_prestige_note',
 				'note_text':			$('#prestige_record_note').val(),
 				'status':				$('input[name=prestige_record_approved]:checked').val(),
-				'id_prestige_record':	$('#notes_prestige_record_id').val(),
-				'id_acting_officer':	$('#acting_office').val()
+				'id_prestige_record':	$('#notes_prestige_record_id').val()
 			},
 			$dtRow = $dataTable.row($row),
 			rowData = $dtRow.data();
@@ -215,7 +235,6 @@
 		let $form = $('#prestige_reward_form');
 		$('input[type=text]', $form).val('');
 		$('select', $form).val('');
-		$('#prestige_reward_id_officers').val($('#acting_office').val());
 		$('#prestige_reward_amount').val('');
 		$('.prestige-type').removeClass('active');
 		$('#prestige_reward_open')

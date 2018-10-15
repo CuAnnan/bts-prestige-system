@@ -1,38 +1,24 @@
 <div class="wrap">
-<script type="text/json" id="prestige_records_requiring_approval"><?php echo json_encode($prestige_records); ?></script>
-<script type="text/json" id="prestige_categories_json"><?php echo json_encode($prestige_categories); ?></script>
-<script type="text/json" id="prestige_actions_json"><?php echo json_encode($prestige_actions); ?></script>
-<script type="text/json" id="domains_json"><?php echo json_encode($domains);?></script>
-<script type="text/json" id="venues_json"><?php echo json_encode($venues);?></script>
-<script type="text/json" id="offices_json"><?php echo json_encode($offices);?></script>
-<script type="text/json" id="users_json"><?php echo json_encode($usersMetaData);?></script>
-<script type="text/javascript">
-	var user_id = <?php echo get_current_user_id(); ?>;
-</script>
-<h1>Prestige Auditing</h1>
+	<script type="text/json" id="prestige_records_requiring_approval"><?php echo json_encode($prestige_records); ?></script>
+	<script type="text/json" id="prestige_categories_json"><?php echo json_encode($prestige_categories); ?></script>
+	<script type="text/json" id="prestige_actions_json"><?php echo json_encode($prestige_actions); ?></script>
+	<script type="text/json" id="domains_json"><?php echo json_encode($domains);?></script>
+	<script type="text/json" id="venues_json"><?php echo json_encode($venues);?></script>
+	<script type="text/json" id="offices_json"><?php echo json_encode($offices);?></script>
+	<script type="text/json" id="users_json"><?php echo json_encode($usersMetaData);?></script>
+	<script type="text/javascript">
+		var user_id = <?php echo get_current_user_id(); ?>;
+		var is_admin = <?php echo boolval(array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles)); ?>;
+	</script>
+	<h1>Prestige Auditing</h1>
 
-<h2>Records requiring attention</h2>
-<div class="content text-right">
-	<strong>Acting Office:</strong><select id="acting_office"></select>
-</div>
-<table id="prestige_record_table">
-	<thead>
-		<tr>
-			<th>Member</th>
-			<th>Action</th>
-			<th>Category</th>
-			<th>Amount</th>
-			<th>Type</th>
-			<th>Date Claimed</th>
-			<th>Awarding Officer</th>
-			<th>Domain</th>
-			<th>Venue</th>
-			<th>Approved</th>
-			<th>&nbsp;</th>
-		</tr>
-	</thead>
-	<tbody></tbody>
-</table>
+	<h2>Records requiring attention</h2>
+	
+	<div id="recordsSection">
+		<ul id="recordsNav" class="nav nav-tabs" role="tablist"></ul>
+		<div class="tab-content" id="recordsTabs"></div>
+	</div>
+
 <button class="btn btn-primary" id="addPrestigeReward">Add Prestige Reward</button>
 </div>
 
@@ -50,13 +36,6 @@
 				<input type="hidden" id="prestige_reward_membership_number"/>
 				<div class="modal-body">
 					<div class="container">
-						<div class="form-group row">
-							<label class="col-form-label col-4" for="prestige_reward_id_officers">Acting office:</label>
-							<div class="col">
-								<select id="prestige_reward_id_officers" required></select>
-							</div>
-						</div>
-						
 						<div class="form-group row">
 							<label class="col-form-label col-4" for="prestige_reward_user_search">Member</label>
 							<div class="col">

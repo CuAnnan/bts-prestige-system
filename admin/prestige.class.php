@@ -52,15 +52,7 @@ class Prestige
 			return ['success'=>false, "error"=>'Permission error'];
 		}
 		
-		$id_record = self::add_prestige_record(
-			$id_users,
-			get_current_user_id(),
-			$id_officers,
-			$id_prestige_action,
-			$date,
-			$reward_amount,
-			$reward_type
-		);
+		$id_record = self::add_prestige_record($id_users,get_current_user_id(),$id_officers,$id_prestige_action,$date,$reward_amount,$reward_type);
 		
 		if($id_record)
 		{
@@ -178,7 +170,7 @@ class Prestige
 	
 	public static function cooerce_record_to_object($record)
 	{
-		$basic_fields = ["id", "officer_id_user", "member_id_user", "reward_amount", "reward_type", "date_claimed", "description", "category", "officer_title", "domain_name", "genre_name", "status"];
+		$basic_fields = ["id", "officer_id_user", "member_id_user", "reward_amount", "reward_type", "date_claimed", "description", "category", "officer_title", "id_officers", "domain_name", "genre_name", "status"];
 		$ordered_record = new \stdClass();
 		$ordered_record->notes = [];
 		foreach($basic_fields as $basic_field)
@@ -216,6 +208,7 @@ class Prestige
 				pa.description			AS description,
 				pc.name					AS category,
 				o.title					AS officer_title,
+				o.id					AS id_officers,
 				d.name					AS domain_name,
 				g.name					AS genre_name,
 				pn.id					AS note_id,
@@ -344,13 +337,14 @@ class Prestige
 		$mc						= self::get_mc($audited_prestige);
 		$prestigeLeft			= self::get_prestige_to_next_mc($audited_prestige);
 		$viewing_own_log		= true;
-		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-management-page.php');
+		require_once (plugin_dir_path(__FILE__).'partials/prestige-management-page.php');
 	}
 	
 	public static function view_prestige_page()
 	{
 		$managed_domains		= Domains::get_managed_domain_ids();
 		$users					= Users::get_users_by_id_domains($managed_domains);
+		$offices				= \BTS_Prestige\Admin\Offices::get_all_active_offices();
 		require_once (plugin_dir_path(__FILE__).'partials/prestige-search-page.php');
 	}
 	
@@ -366,7 +360,7 @@ class Prestige
 		$venues					= \BTS_Prestige\Admin\Venues::get_all_active_venues();
 		$usersMetaData			= \BTS_Prestige\Admin\Users::getUsermeta();
 		
-		require_once (plugin_dir_path(__FILE__).'partials/bts-prestige-system-prestige-auditing.php');
+		require_once (plugin_dir_path(__FILE__).'partials/prestige-auditing.php');
 	}
 	
 	public static function fetch_prestige_entries_requiring_action()
@@ -384,6 +378,7 @@ class Prestige
 				pr.status				AS status,
 				pc.name					AS category,
 				o.title					AS officer_title,
+				o.id					AS id_officers,
 				d.name					AS domain_name,
 				g.name					AS genre_name,
 				pn.id					AS note_id,

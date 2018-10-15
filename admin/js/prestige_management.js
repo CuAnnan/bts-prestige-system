@@ -89,14 +89,15 @@
 	{
 		let idDomains = $('#id_domains').val(),
 			idVenues = $('#id_venues').val(),
+			chain = $('#chain').val(),
 			officer = null;
 		if(idVenues)
 		{
-			officer = offices.filter(office=>office.id_venues === idVenues && office.chain === 'Coordinator')[0];
+			officer = offices.filter(office=>office.id_venues === idVenues && office.chain === chain)[0];
 		}
 		else
 		{
-			officer = offices.filter(office=>office.id_domains === idDomains && office.chain === 'Coordinator')[0];
+			officer = offices.filter(office=>office.id_domains === idDomains && office.chain === chain)[0];
 		}
 		let data = {
 				action: 'add_prestige_record',
@@ -109,7 +110,6 @@
 			},
 			domainName = $('#id_domains option:selected').text(),
 			genreName = idVenues?$('#id_venues option:selected').text():null;
-		
 		$.post(
 			ajaxurl,
 			data,

@@ -37,15 +37,20 @@
 		
 		for(let record of Object.values(recordsByOffice))
 		{
-			let domain = domains.filter((domain)=>domain.id == record.office.id_domains)[0],
-				officeAndDomain = record.office.title + ' ' + domain.name,
-				idPrefix = officeAndDomain.replace(/\s/g, '-'),
-				$tabNav = $(`<li class="nav-item"><a class="nav-link" id="${idPrefix}-tab" data-toggle="tab" href="#${idPrefix}" role="tab" aria-controls="profile" aria-selected="${firstRecord}">${officeAndDomain}</a></li>`).appendTo($recordsNav),
+			let domain = domains.filter((domain)=>domain.id === record.office.id_domains)[0],
+				venue = venues.filter((venue)=>venue.id === record.office.id_venues)[0],
+				officeAndDomain = record.office.title +(venue?' '+venue.genre:'') + (domain.nmc_code?`(${domain.nmc_code})`:''),
+				idPrefix = `record_${record.office.id}`,
+				$tabNav = $(`<li class="nav-item" data-id-officer="${record.office.id}"><a class="nav-link" id="${idPrefix}-tab" data-toggle="tab" href="#${idPrefix}" role="tab" aria-controls="profile" aria-selected="${firstRecord}">${officeAndDomain}</a></li>`)
+							.appendTo($recordsNav)
+							.click(function(){
+								let $node = $(this);
+								$('#id-acting-office').val($node.data('idOfficer'));
+							}),
 				$tabContent = $(`<div class="tab-pane fade" id="${idPrefix}" role="tabpanel" aria-labelledby="nav-profile-tab"></div>`).appendTo($recordsTabs),
 				$dataTableContainer = $(`<table id="${idPrefix}_prestige_table"><thead><tr><th>Member</th><th>Action</th><th>Category</th><th>Amount</th><th>Type</th><th>Date Claimed</th><th>Awarding Officer</th><th>Domain</th><th>Venue</th><th>Approved</th><th>&nbsp;</th></tr></thead><tbody></tbody></table>`);
 				$dataTableContainer.appendTo($tabContent),
 				$dataTable = buildTabDataTable($dataTableContainer, record);
-				
 			if(firstRecord)
 			{
 				$('a', $tabNav).addClass('active');
@@ -160,39 +165,14 @@
 	function bindEvents()
 	{
 		$('#prestige_record_note_btn').click(addPrestigeNote);
-		$('#addPrestigeReward').click(showPrestigeRewardModal);
+		$('#addPrestigeReward').click(Prestige.showClaimModal);
 		$('#prestige_reward_form').submit(()=>{handleNewPrestigeReward(); return false;});
 		bindNotesButtons();
 	}
 	
 	function bindNotesButtons()
 	{
-		$('.prestige-note-button').off().click(showNotes);
-	}
-	
-	function showNotes()
-	{
-		let $button = $(this);
-		$row = $button.closest('tr');
-		let	data = $row.data(),
-			notes = data.notes,
-			$notesTable =$('#prestige-notes').empty(),
-			currentStatus = notes[notes.length - 1].note_status,
-			$status_button = $(`input[name='prestige_record_approved'][value='${currentStatus}']`);
-		$('.prestige-record-approved').removeClass('active');
-		$status_button.prop('checked', true);
-		$status_button.closest('.prestige-record-approved').addClass('active');
-		$('#prestige_record_approved').val('Submitted');
-		$('#notes_prestige_record_id').val(data.id);
-		for(let note of notes)
-		{
-			$('<tr/>')
-				.append($('<td/>').text(note.note))
-				.append($('<td/>').text(note.status))
-				.append($('<td/>').text(note.note_date))
-				.appendTo($notesTable);
-		}
-		$('#prestigeNotesModalDialog').modal('show');
+		$('.prestige-note-button').off().click(Prestige.showNotesModal);
 	}
 	
 	function addPrestigeNote()
@@ -223,32 +203,6 @@
 				$('#prestigeNotesModalDialog').modal('hide');
 			}
 		);
-	}
-	
-	function showPrestigeRewardModal()
-	{
-		let now = new Date(),
-			day = ("0" + now.getDate()).slice(-2),
-			month = ("0" + (now.getMonth() + 1)).slice(-2),
-			year = now.getFullYear();
-		
-		let $form = $('#prestige_reward_form');
-		$('input[type=text]', $form).val('');
-		$('select', $form).val('');
-		$('#prestige_reward_amount').val('');
-		$('.prestige-type').removeClass('active');
-		$('#prestige_reward_open')
-			.prop('checked', true)
-			.closest('.prestige-type')
-			.addClass('active');
-		$('.prestige-reward-approved').removeClass('active');
-		$('#prestige_reward_approve_submitted')
-			.prop('checked', true)
-			.closest('.prestige-reward-approved')
-			.addClass('active');
-		$('#prestige_reward_claim_date').val(`${year}-${month}-${day}`);
-		$('#prestigeAddModalDialog').modal('show');
-		
 	}
 	
 	function handleNewPrestigeReward()

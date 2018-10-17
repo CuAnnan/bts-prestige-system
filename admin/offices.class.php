@@ -345,10 +345,11 @@ class Offices
 		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		$offices = $wpdb->get_results(
 			"SELECT 
-				o.id, o.title, o.id_domains, o.id_venues, o.id_users, o.chain, v.name AS venue
+				o.id, o.title AS title, o.id_domains, o.id_venues, o.id_users, o.chain, v.name AS venue, IF( g.name IS NULL, o.title, CONCAT (o.title, ' ', g.name)) AS full_title
 			FROM 
 							{$prefix}officers o
 				LEFT JOIN	{$prefix}venues v ON(o.id_venues = v.id)
+				LEFT JOIN	{$prefix}genres g ON(v.id_genres = g.id)
 			WHERE 
 				id_superior IS NULL 
 				AND (v.id IS NULL OR v.active = 1)

@@ -189,6 +189,8 @@ class Prestige
 			$note_object->$note_field = $record->$note_field;
 		}
 		$note_object->status = $note_object->note_status;
+		$raw_user_meta = get_user_meta($record->note_id_users);
+		$note_object->member = "{$raw_user_meta['first_name'][0]} {$raw_user_meta['last_name'][0]}";
 		return $note_object;
 	}
 	
@@ -216,6 +218,7 @@ class Prestige
 				pn.status				AS note_status,
 				pn.date					AS note_date,
 				n_o.title				AS note_officer_title,
+				nu.ID					AS note_id_users,
 				dn.name					AS note_domain_name,
 				dg.name					AS note_genre_name
 			FROM
@@ -386,6 +389,7 @@ class Prestige
 				pn.status				AS note_status,
 				pn.date					AS note_date,
 				n_o.title				AS note_officer_title,
+				nu.ID					AS note_id_users,
 				dn.name					AS note_domain_name,
 				dg.name					AS note_genre_name
 			FROM

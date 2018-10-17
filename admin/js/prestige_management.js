@@ -58,7 +58,7 @@
 	function buildPrestigeModal()
 	{
 		populateSelect('#id_prestige_categories', prestigeCategories, 'name', populateActions);
-		populateSelect('#id_domains', domains, 'name', populateVenues);
+		populateSelect('#id_domains', domains, 'name', populateOffices);
 		
 	}
 	
@@ -67,9 +67,10 @@
 		populateSelect('#id_prestige_actions', prestigeActions.filter(action => action.id_prestige_category === $('#id_prestige_categories').val()), 'description');
 	}
 	
-	function populateVenues()
+	function populateOffices()
 	{
-		populateSelect('#id_venues', venues.filter(venue => venue.id_domains === $('#id_domains').val()), 'genre');
+		populateSelect('#id_venues', offices.filter(office=> (office.id_domains === $('#id_domains').val() && office.chain === $('#chain').val())), 'full_title');
+		//populateSelect('#id_venues', venues.filter(venue => venue.id_domains === $('#id_domains').val()), 'genre');
 	}
 	
 	function bindEvents()
@@ -77,12 +78,13 @@
 		$('#prestige_record_note_btn').click(addPrestigeNote);
 		$('#prestige_claim_button').click(showPrestigeClaimForm);
 		$('#newPrestigeRecordForm').on('submit', ()=>{validateAndSubmitPrestigeClaimForm(); return false;});
-		bindNotesButtons();
+		$('#chain').change(populateOffices);
+		Prestige.bindNotesButtons();
 	}
 	
 	function bindNotesButtons()
 	{
-		$('.prestige-note-button').off().click(showNotes);
+		$('.prestige-note-button').off().click(Prestige.showNotesModal);
 	}
 	
 	function validateAndSubmitPrestigeClaimForm()

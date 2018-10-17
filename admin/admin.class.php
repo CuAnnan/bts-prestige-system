@@ -151,6 +151,7 @@ class Admin
 		wp_enqueue_style( $this->plugin_name.'admin', plugin_dir_url( __FILE__ ) . 'css/easy-autocomplete.min.css', array(), $this->version, 'all');
 		wp_enqueue_script( $this->plugin_name.'autocomplete', plugin_dir_url( __FILE__ ) . 'js/jquery.easy-autocomplete.min.js', array( 'jquery' ), $this->version, false );
 		wp_enqueue_script($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name.'prestige_globals', plugin_dir_url(__FILE__).'js/Prestige.class.js', array('jquery'), $this->version, false);
 		wp_enqueue_script($this->plugin_name.'prestige_auditing', plugin_dir_url(__FILE__).'js/prestige_auditing.js', array('jquery'), $this->version, false);
 
 		Prestige::show_prestige_auditing_page();
@@ -160,6 +161,7 @@ class Admin
 	{
 		wp_enqueue_style($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css', array(), $this->version, 'all');
 		wp_enqueue_script($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name.'prestige_globals', plugin_dir_url(__FILE__).'js/Prestige.class.js', array('jquery'), $this->version, false);
 		wp_enqueue_script($this->plugin_name.'prestige_management', plugin_dir_url(__FILE__).'js/prestige_management.js', array('jquery'), $this->version, false);
 		Prestige::show_prestige_management_page();
 	}
@@ -171,6 +173,7 @@ class Admin
 		wp_enqueue_style($this->plugin_name.'view_prestige', plugin_dir_url(__FILE__).'css/prestige_log_search.css', array(), $this->version, 'all');
 		wp_enqueue_script($this->plugin_name.'autocomplete', plugin_dir_url( __FILE__ ) . 'js/jquery.easy-autocomplete.min.js', array( 'jquery' ), $this->version, false );
 		wp_enqueue_script($this->plugin_name.'data_tables', 'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name.'prestige_globals', plugin_dir_url(__FILE__).'js/Prestige.class.js', array('jquery'), $this->version, false);
 		wp_enqueue_script($this->plugin_name.'view_prestige', plugin_dir_url(__FILE__).'js/prestige_log_search.js', array('jquery'), $this->version, false);
 		Prestige::view_prestige_page();
 	}

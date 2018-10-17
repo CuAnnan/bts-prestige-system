@@ -353,6 +353,7 @@ class Offices
 			WHERE 
 				id_superior IS NULL 
 				AND (v.id IS NULL OR v.active = 1)
+				AND o.id_users > 1
 				AND o.id_domains IS NOT NULL");
 		return $offices;
 	}

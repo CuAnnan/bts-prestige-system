@@ -100,12 +100,9 @@
 							<div class="col"><select class="form-control" id="id_domains" required></select></div>
 						</div>
 						<div class="form-group row">
-							<label class="col-form-label col-4" for="id_venues">Office</label>
+							<label class="col-form-label col-4" for="id_officers">Office</label>
 							<div class="col">
-								<select class="form-control" id="id_venues"></select>
-								<small class="form-text text-muted">
-									To claim prestige from the Domain Officer, leave the venue blank.
-								</small>
+								<select class="form-control" id="id_officers" required></select>
 							</div>
 						</div>
 						<?php } ?>

@@ -69,7 +69,7 @@
 	
 	function populateOffices()
 	{
-		populateSelect('#id_venues', offices.filter(office=> (office.id_domains === $('#id_domains').val() && office.chain === $('#chain').val())), 'full_title');
+		populateSelect('#id_officers', offices.filter(office=> (office.id_domains === $('#id_domains').val() && office.chain === $('#chain').val())), 'full_title');
 		//populateSelect('#id_venues', venues.filter(venue => venue.id_domains === $('#id_domains').val()), 'genre');
 	}
 	
@@ -89,21 +89,12 @@
 	
 	function validateAndSubmitPrestigeClaimForm()
 	{
-		let idDomains = $('#id_domains').val(),
-			idVenues = $('#id_venues').val(),
-			chain = $('#chain').val(),
-			officer = null;
-		if(idVenues)
-		{
-			officer = offices.filter(office=>office.id_venues === idVenues && office.chain === chain)[0];
-		}
-		else
-		{
-			officer = offices.filter(office=>office.id_domains === idDomains && office.chain === chain)[0];
-		}
+		let officer = offices.filter((office)=>office.id === $('#id_officers').val())[0],
+			venue = officer.id_venues?venues.filter((venue)=>venue.id == officer.id_venues)[0]:null;
+		
 		let data = {
 				action: 'add_prestige_record',
-				id_officers:parseInt(officer.id),
+				id_officers:$('#id_officers').val(),
 				id_prestige_actions:$('#id_prestige_actions').val(),
 				prestige_amount:parseInt($('#prestige_amount').val()),
 				prestige_type:$('input[name=prestige_type]:checked').val(),
@@ -111,7 +102,7 @@
 				date:$('#claim_date').val()
 			},
 			domainName = $('#id_domains option:selected').text(),
-			genreName = idVenues?$('#id_venues option:selected').text():null;
+			genreName = venue?venue.genre:null;
 		$.post(
 			ajaxurl,
 			data,

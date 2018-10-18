@@ -8,7 +8,7 @@ UPDATE `wp_bts_genres` SET `short_name` = 'MtA CofD' WHERE `wp_bts_genres`.`id` 
 UPDATE `wp_bts_genres` SET `short_name` = 'WtF CofD' WHERE `wp_bts_genres`.`id` = 14;
 UPDATE `wp_bts_genres` SET `short_name` = 'X CofD' WHERE `wp_bts_genres`.`id` = 16;
 
-CREATE TABLE `wing_wordpress_bts`.`wp_bts_offices` ( `id` BIGINT(20) NOT NULL AUTO_INCREMENT , `title` VARCHAR(255) NOT NULL , `short_form` VARCHAR(10) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+CREATE TABLE `wp_bts_offices` ( `id` BIGINT(20) NOT NULL AUTO_INCREMENT , `title` VARCHAR(255) NOT NULL , `short_form` VARCHAR(10) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 
 INSERT INTO wp_bts_offices
         (title, short_form)
@@ -134,3 +134,7 @@ UPDATE wp_bts_officers SET id_offices = (SELECT id FROM wp_bts_offices WHERE sho
 UPDATE wp_bts_officers SET id_offices = (SELECT id FROM wp_bts_offices WHERE short_form = "VST") WHERE title = "Venue Storyteller";
 UPDATE wp_bts_officers SET id_offices = (SELECT id FROM wp_bts_offices WHERE short_form = "VST") WHERE title = "Venue Storyteller - City of Lights";
 UPDATE wp_bts_officers SET id_offices = (SELECT id FROM wp_bts_offices WHERE short_form = "VST") WHERE title = "Venue Storyteller: HellCastle";
+
+ALTER TABLE `wp_bts_offices` ADD `chain` ENUM('Coordinator','Storyteller') NOT NULL DEFAULT 'Coordinator' AFTER `short_form`;
+UPDATE wp_bts_offices offices INNER JOIN wp_bts_officers officers ON (officers.id_offices = offices.id) SET offices.chain = officers.chain;
+ALTER TABLE `wp_bts_officers` DROP `chain`;

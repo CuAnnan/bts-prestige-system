@@ -211,6 +211,7 @@ class Prestige
 				pc.name					AS category,
 				o.title					AS officer_title,
 				o.id					AS id_officers,
+				pr_off.short_form		AS office_short_form,
 				d.name					AS domain_name,
 				g.name					AS genre_name,
 				pn.id					AS note_id,
@@ -218,23 +219,26 @@ class Prestige
 				pn.status				AS note_status,
 				pn.date					AS note_date,
 				n_o.title				AS note_officer_title,
+				n_off.short_form		AS note_officer_short_form,
 				nu.ID					AS note_id_users,
 				dn.name					AS note_domain_name,
 				dg.name					AS note_genre_name
 			FROM
 							{$prefix}prestige_rewards pr
-				LEFT JOIN	{$prefix}prestige_actions pa		ON (pa.id	= pr.id_prestige_action)
-				LEFT JOIN	{$prefix}prestige_categories pc		ON (pc.id	= pa.id_prestige_category)
-				LEFT JOIN	{$prefix}prestige_reward_notes pn	ON (pr.id	= pn.id_prestige_rewards)
-				LEFT JOIN	{$prefix}officers o					ON (o.id	= pr.id_officer_approved)
-				LEFT JOIN	{$prefix}venues v					ON (v.id	= o.id_venues)
-				LEFT JOIN	{$prefix}domains d					ON (d.id	= o.id_domains)
-				LEFT JOIN	{$prefix}genres g					ON (g.id	= v.id_genres)
-				LEFT JOIN	{$wpdb->prefix}users nu				ON (nu.ID	= pn.id_users)
-				LEFT JOIN	{$prefix}officers n_o				ON (n_o.id	= pn.id_officer)
-				LEFT JOIN	{$prefix}venues vn					ON (vn.id	= n_o.id_venues)
-				LEFT JOIN	{$prefix}domains dn					ON (dn.id	= n_o.id_domains)
-				LEFT JOIN	{$prefix}genres dg					ON (dg.id	= vn.id_genres)
+				LEFT JOIN	{$prefix}prestige_actions pa		ON (pa.id		= pr.id_prestige_action)
+				LEFT JOIN	{$prefix}prestige_categories pc		ON (pc.id		= pa.id_prestige_category)
+				LEFT JOIN	{$prefix}prestige_reward_notes pn	ON (pr.id		= pn.id_prestige_rewards)
+				LEFT JOIN	{$prefix}officers o					ON (o.id		= pr.id_officer_approved)
+				LEFT JOIN	{$prefix}offices pr_off				ON (pr_off.id	= o.id_offices)
+				LEFT JOIN	{$prefix}venues v					ON (v.id		= o.id_venues)
+				LEFT JOIN	{$prefix}domains d					ON (d.id		= o.id_domains)
+				LEFT JOIN	{$prefix}genres g					ON (g.id		= v.id_genres)
+				LEFT JOIN	{$wpdb->prefix}users nu				ON (nu.ID		= pn.id_users)
+				LEFT JOIN	{$prefix}officers n_o				ON (n_o.id		= pn.id_officer)
+				LEFT JOIN	{$prefix}offices n_off				ON (n_off.id	= n_o.id_offices)
+				LEFT JOIN	{$prefix}venues vn					ON (vn.id		= n_o.id_venues)
+				LEFT JOIN	{$prefix}domains dn					ON (dn.id		= n_o.id_domains)
+				LEFT JOIN	{$prefix}genres dg					ON (dg.id		= vn.id_genres)
 			WHERE
 				pr.id_member = %d
 			ORDER BY 
@@ -377,11 +381,12 @@ class Prestige
 				pr.reward_amount		AS reward_amount,
 				pr.reward_type			AS reward_type,
 				pr.date_claimed			AS date_claimed,
-				pa.description			AS description,
 				pr.status				AS status,
+				pa.description			AS description,
 				pc.name					AS category,
 				o.title					AS officer_title,
 				o.id					AS id_officers,
+				pr_off.short_form		AS office_short_form,
 				d.name					AS domain_name,
 				g.name					AS genre_name,
 				pn.id					AS note_id,
@@ -389,23 +394,26 @@ class Prestige
 				pn.status				AS note_status,
 				pn.date					AS note_date,
 				n_o.title				AS note_officer_title,
+				n_off.short_form		AS note_officer_short_form,
 				nu.ID					AS note_id_users,
 				dn.name					AS note_domain_name,
 				dg.name					AS note_genre_name
 			FROM
 							{$prefix}prestige_rewards pr
-				LEFT JOIN	{$prefix}prestige_actions pa		ON (pa.id	= pr.id_prestige_action)
-				LEFT JOIN	{$prefix}prestige_categories pc		ON (pc.id	= pa.id_prestige_category)
-				LEFT JOIN	{$prefix}prestige_reward_notes pn	ON (pr.id	= pn.id_prestige_rewards)
-				LEFT JOIN	{$prefix}officers o					ON (o.id	= pr.id_officer_approved)
-				LEFT JOIN	{$prefix}venues v					ON (v.id	= o.id_venues)
-				LEFT JOIN	{$prefix}domains d					ON (d.id	= o.id_domains)
-				LEFT JOIN	{$prefix}genres g					ON (g.id	= v.id_genres)
-				LEFT JOIN	{$wpdb->prefix}users nu				ON (nu.ID	= pn.id_users)
-				LEFT JOIN	{$prefix}officers n_o				ON (n_o.id	= pn.id_officer)
-				LEFT JOIN	{$prefix}venues vn					ON (vn.id	= n_o.id_venues)
-				LEFT JOIN	{$prefix}domains dn					ON (dn.id	= n_o.id_domains)
-				LEFT JOIN	{$prefix}genres dg					ON (dg.id	= vn.id_genres)
+				LEFT JOIN	{$prefix}prestige_actions pa		ON (pa.id		= pr.id_prestige_action)
+				LEFT JOIN	{$prefix}prestige_categories pc		ON (pc.id		= pa.id_prestige_category)
+				LEFT JOIN	{$prefix}prestige_reward_notes pn	ON (pr.id		= pn.id_prestige_rewards)
+				LEFT JOIN	{$prefix}officers o					ON (o.id		= pr.id_officer_approved)
+				LEFT JOIN	{$prefix}offices pr_off				ON (pr_off.id	= o.id_offices)
+				LEFT JOIN	{$prefix}venues v					ON (v.id		= o.id_venues)
+				LEFT JOIN	{$prefix}domains d					ON (d.id		= o.id_domains)
+				LEFT JOIN	{$prefix}genres g					ON (g.id		= v.id_genres)
+				LEFT JOIN	{$wpdb->prefix}users nu				ON (nu.ID		= pn.id_users)
+				LEFT JOIN	{$prefix}officers n_o				ON (n_o.id		= pn.id_officer)
+				LEFT JOIN	{$prefix}offices n_off				ON (n_off.id	= n_o.id_offices	)
+				LEFT JOIN	{$prefix}venues vn					ON (vn.id		= n_o.id_venues)
+				LEFT JOIN	{$prefix}domains dn					ON (dn.id		= n_o.id_domains)
+				LEFT JOIN	{$prefix}genres dg					ON (dg.id		= vn.id_genres)
 			WHERE
 				pr.status  IN ('Submitted', 'Approved')";
 		

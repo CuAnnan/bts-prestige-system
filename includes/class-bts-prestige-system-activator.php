@@ -125,6 +125,7 @@ class Bts_Prestige_System_Activator {
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
 				'title varchar(255)',
 				'short_form varchar(10)',
+				'chain ENUM("Coordinator", "Storyteller") DEFAULT "Coordinator"',
 				'PRIMARY KEY  (id)',
 			],
 			'officers'=>[
@@ -136,7 +137,6 @@ class Bts_Prestige_System_Activator {
 				'id_superior bigint(20) UNSIGNED',
 				'title varchar(255)',
 				'email varchar(255)',
-				'chain ENUM("Coordinator", "Storyteller") DEFAULT "Coordinator"',
 				'date_appointed date',
 				'PRIMARY KEY  (id)',
 				"FOREIGN KEY (id_users) REFERENCES {$wpdb->prefix}users(ID)",

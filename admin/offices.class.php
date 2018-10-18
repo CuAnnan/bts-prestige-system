@@ -29,7 +29,7 @@ class Offices
 				o.id_superior		AS id_superior,
 				o.title				AS title,
 				o.email				AS email,
-				o.chain				AS chain,
+				oo.chain			AS chain,
 				o.id_superior		AS id_superior,
 				o.date_appointed	AS date_appointed,
 				um_fn.meta_value	AS first_name,
@@ -39,6 +39,7 @@ class Offices
 				g.name				AS genre_name
 			FROM 
 							{$prefix}officers		o
+				LEFT JOIN	{$prefix}offices		oo		ON (o.id_offices = oo.id)
 				LEFT JOIN	{$wpdb->prefix}users	u 		ON (o.id_users = u.ID)
                 LEFT JOIN	{$wpdb->prefix}usermeta	um_fn 	ON (u.ID = um_fn.user_id)
                 LEFT JOIN	{$wpdb->prefix}usermeta	um_sn 	ON (u.ID = um_sn.user_id)
@@ -207,7 +208,11 @@ class Offices
 		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		$officer = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT id_domains, id_venues, id_superior, id_users, chain FROM {$prefix}officers WHERE id = %d",
+				"SELECT "
+					."o.id_domains, o.id_venues, o.id_superior, o.id_users, oo.chain "
+				."FROM {$prefix}officers o "
+				. "LEFT JOIN {$prefix}offices oo ON (o.id_offices = oo.id)"
+				. "WHERE id = %d",
 				$id_officers
 			)
 		);
@@ -275,9 +280,10 @@ class Offices
 		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		return $wpdb->get_results(
 			"SELECT 
-				o.id_superior, o.id, o.title, o.id_domains, o.id_venues, o.id_users, o.chain, v.name AS venue
+				o.id_superior, o.id, o.title, o.id_domains, o.id_venues, o.id_users, oo.chain, v.name AS venue
 			FROM 
 							{$prefix}officers o
+				LEFT JOIN	{$prefix}offices oo ON(o.id_offices = oo.id)
 				LEFT JOIN	{$prefix}venues v ON(o.id_venues = v.id)
 			WHERE 
 				id_superior IS NULL 
@@ -345,9 +351,10 @@ class Offices
 		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
 		$offices = $wpdb->get_results(
 			"SELECT 
-				o.id, o.title AS title, o.id_domains, o.id_venues, o.id_users, o.chain, v.name AS venue, IF( g.name IS NULL, o.title, CONCAT (o.title, ' ', g.name)) AS full_title
+				o.id, o.title AS title, o.id_domains, o.id_venues, o.id_users, oo.chain, v.name AS venue, IF( g.name IS NULL, o.title, CONCAT (o.title, ' ', g.name)) AS full_title
 			FROM 
 							{$prefix}officers o
+				LEFT JOIN	{$prefix}offices oo ON (o.id_offices = oo.id)
 				LEFT JOIN	{$prefix}venues v ON(o.id_venues = v.id)
 				LEFT JOIN	{$prefix}genres g ON(v.id_genres = g.id)
 			WHERE 

@@ -13,11 +13,7 @@
 	{
 		let $select = $(selector).empty(),
 			$options = [$('<option value="">---</option>')];
-		
-		for(let field of fields)
-		{
-			$options.push($(`<option value="${field.id}">${field[fieldTitle]}</option>`));
-		}
+		$options.push(...arrayToOptions(fields, fieldTitle));
 		$select.append(...$options);
 		if(handler)
 		{
@@ -25,9 +21,19 @@
 		}
 	}
 	
+	function arrayToOptions(fields, fieldTitle)
+	{
+		let $options = [];
+		for(let field of fields)
+		{
+			$options.push($(`<option value="${field.id}">${field[fieldTitle]}</option>`));
+		}
+		return $options;
+	}
+	
 	class Prestige
 	{
-		static showClaimModal()
+		static showClaimModal(offices)
 		{
 			let now = new Date(),
 			day = ("0" + now.getDate()).slice(-2),
@@ -50,13 +56,24 @@
 				.addClass('active');
 			$('#claim_date').val(`${year}-${month}-${day}`);
 			
-			let $offices = $('#prestige_reward_acting_officer');
-			if($offices)
-			{
-				
-			}
-		
+			Prestige.populateOfficesSelect($('#prestige_reward_id_officers'), offices);
+			$('#prestige_reward_id_officers').val($("#id-acting-office").val());
 			$claimModal.modal('show');
+		}
+		
+		static populateOfficesSelect($offices, offices)
+		{
+			console.log($offices);
+			if(!$offices)
+			{
+				return;
+			}
+			let userOffices = offices.filter((office)=>office.id_users == user_id),
+				relevantOffices = offices.filter((office)=>office.id === $("#id-acting-office").val());
+			$offices.empty();
+			$('<option>---</option>').appendTo($offices);
+			$('<optgroup/>').prop('label', 'Original office').append(arrayToOptions(relevantOffices, 'title')).appendTo($offices);
+			$('<optgroup/>').prop('label', 'My offices').append(arrayToOptions(userOffices, 'title')).appendTo($offices)
 		}
 		
 		static showNotesModal()

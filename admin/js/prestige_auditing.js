@@ -37,12 +37,12 @@
 		
 		for(let record of Object.values(recordsByOffice))
 		{
-			console.log(record);
 			let domain = domains.filter((domain)=>domain.id === record.office.id_domains)[0],
 				venue = venues.filter((venue)=>venue.id === record.office.id_venues)[0],
-				officeAndDomain = record.office.title +(venue?' '+venue.genre:'') + (domain.nmc_code?`(${domain.nmc_code})`:''),
+				tabTitle = record.office.short_form + (venue?`-${venue.short_name}`:'')+ (domain.nmc_code?` (${domain.nmc_code})`:''),
+				officeAndDomain = record.office.title +(venue?`-${venue.genre}`:'') + (domain.name?` (${domain.name})`:''),
 				idPrefix = `record_${record.office.id}`,
-				$tabNav = $(`<li class="nav-item" data-id-officer="${record.office.id}"><a class="nav-link" id="${idPrefix}-tab" data-toggle="tab" href="#${idPrefix}" role="tab" aria-controls="profile" aria-selected="${firstRecord}">${officeAndDomain}</a></li>`)
+				$tabNav = $(`<li class="nav-item" data-id-officer="${record.office.id}"><a title="${officeAndDomain}" class="nav-link" id="${idPrefix}-tab" data-toggle="tab" href="#${idPrefix}" role="tab" aria-controls="profile" aria-selected="${firstRecord}">${tabTitle}</a></li>`)
 							.appendTo($recordsNav)
 							.click(function(){
 								let $node = $(this);
@@ -56,6 +56,7 @@
 			{
 				$('a', $tabNav).addClass('active');
 				$tabContent.addClass('active').addClass('show');
+				$('#id-acting-office').val($tabNav.data('idOfficer'));
 			}
 			firstRecord = false;
 		}
@@ -155,7 +156,6 @@
 	function buildPrestigeModal()
 	{
 		populateSelect('#prestige_reward_id_prestige_categories', prestigeCategories, 'name', populateActions);
-		populateSelect('#prestige_reward_id_officers', offices.filter((office)=>office.id_users == user_id), 'title');
 	}
 	
 	function populateActions()
@@ -166,7 +166,7 @@
 	function bindEvents()
 	{
 		$('#prestige_record_note_btn').click(addPrestigeNote);
-		$('#addPrestigeReward').click(Prestige.showClaimModal);
+		$('#addPrestigeReward').click(()=>{Prestige.showClaimModal(offices)});
 		$('#prestige_reward_form').submit(()=>{handleNewPrestigeReward(); return false;});
 		bindNotesButtons();
 	}

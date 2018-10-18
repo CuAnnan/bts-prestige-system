@@ -59,7 +59,6 @@
 	{
 		populateSelect('#id_prestige_categories', prestigeCategories, 'name', populateActions);
 		populateSelect('#id_domains', domains, 'name', populateOffices);
-		
 	}
 	
 	function populateActions()

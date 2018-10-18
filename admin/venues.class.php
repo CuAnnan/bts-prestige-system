@@ -38,6 +38,7 @@ class Venues
 				v.name				AS name,
 				v.nmc_code			AS nmc_code,
 				g.name				AS genre,
+				g.short_name		AS short_name,
                 g.id				AS id_genres,
 				d.name				AS domain_name,
                 d.id				AS id_domains

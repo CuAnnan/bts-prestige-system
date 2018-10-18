@@ -337,7 +337,7 @@ class Prestige
 		$prestige_categories	= self::get_prestige_categories();
 		$prestige_actions		= self::get_prestige_actions();
 		$domains				= \BTS_Prestige\Admin\Domains::get_all_domains();
-		$offices				= \BTS_Prestige\Admin\Offices::get_all_active_offices();
+		$offices				= \BTS_Prestige\Admin\Offices::get_all_offices();
 		$venues					= \BTS_Prestige\Admin\Venues::get_all_active_venues();
 		$audited_prestige		= self::get_audited_prestige(get_current_user_id());
 		
@@ -351,7 +351,7 @@ class Prestige
 	{
 		$managed_domains		= Domains::get_managed_domain_ids();
 		$users					= Users::get_users_by_id_domains($managed_domains);
-		$offices				= \BTS_Prestige\Admin\Offices::get_all_active_offices();
+		$offices				= \BTS_Prestige\Admin\Offices::get_all_offices();
 		require_once (plugin_dir_path(__FILE__).'partials/prestige-search-page.php');
 	}
 	
@@ -363,7 +363,7 @@ class Prestige
 		$can_audit				= array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles);
 		
 		$domains				= \BTS_Prestige\Admin\Domains::get_all_domains();
-		$offices				= \BTS_Prestige\Admin\Offices::get_all_active_offices();
+		$offices				= \BTS_Prestige\Admin\Offices::get_all_offices();
 		$venues					= \BTS_Prestige\Admin\Venues::get_all_active_venues();
 		$usersMetaData			= \BTS_Prestige\Admin\Users::getUsermeta();
 		

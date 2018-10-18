@@ -37,6 +37,7 @@
 		
 		for(let record of Object.values(recordsByOffice))
 		{
+			console.log(record);
 			let domain = domains.filter((domain)=>domain.id === record.office.id_domains)[0],
 				venue = venues.filter((venue)=>venue.id === record.office.id_venues)[0],
 				officeAndDomain = record.office.title +(venue?' '+venue.genre:'') + (domain.nmc_code?`(${domain.nmc_code})`:''),

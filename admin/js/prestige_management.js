@@ -69,8 +69,11 @@
 	
 	function populateOffices()
 	{
-		populateSelect('#id_officers', offices.filter(office=> (office.id_domains === $('#id_domains').val() && office.chain === $('#chain').val())), 'full_title');
-		//populateSelect('#id_venues', venues.filter(venue => venue.id_domains === $('#id_domains').val()), 'genre');
+		// so, this one needs a bit of unpacking: any offices that are held by the admin user should be ignored.
+		// Any office that has no venue is a domain office. Any office that has a venue, the venue should be active.
+		// other than that, just match the domain to the chosen domain and the chain to the chosen chain.
+		let relevantOffices = offices.filter(office=>(office.id_users !== "1" && (!office.venue || (office.active && office.active === '1')) && office.id_domains === $('#id_domains').val() && office.chain === $('#chain').val()));
+		populateSelect('#id_officers', relevantOffices, 'full_title');
 	}
 	
 	function bindEvents()

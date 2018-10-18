@@ -365,6 +365,24 @@ class Offices
 		return $offices;
 	}
 	
+	public static function get_all_offices()
+	{
+		global $wpdb;
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+		$offices = $wpdb->get_results(
+			"SELECT 
+				o.id, o.title AS title, o.id_domains, o.id_venues, o.id_users, oo.chain, v.name AS venue, IF( g.name IS NULL, o.title, CONCAT (o.title, ' ', g.name)) AS full_title, v.active, g.name AS genre
+			FROM 
+							{$prefix}officers o
+				LEFT JOIN	{$prefix}offices oo ON (o.id_offices = oo.id)
+				LEFT JOIN	{$prefix}venues v ON(o.id_venues = v.id)
+				LEFT JOIN	{$prefix}genres g ON(v.id_genres = g.id)
+			WHERE 
+				id_superior IS NULL 
+				AND o.id_domains IS NOT NULL");
+		return $offices;
+	}
+	
 	public static function get_id_offices_by_id_users($id_users)
 	{
 		global $wpdb;

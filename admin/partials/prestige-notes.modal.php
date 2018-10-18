@@ -23,10 +23,26 @@
 						<tfoot>
 							<tr>
 								<td><input type="text" class="form-control" style="width:100%" id="prestige_record_note"/></td>
-								<td colspan="3"><?php if(isset($viewing_own_log) && $viewing_own_log){?>
-										&nbsp;
-										<?php }else {?>
-										<div class="btn-group btn-group-toggle" data-toggle="buttons">
+								<td>
+									<?php if(isset($viewing_own_log) && $viewing_own_log){?>
+									&nbsp;
+									<?php }else {?>
+									<select id="prestige_record_id_officers" class="form-control">
+									</select>
+									<?php } ?>
+								</td>
+								<td></td>
+								<td><?php if(isset($viewing_own_log) && $viewing_own_log){?>
+									&nbsp;
+									<?php }else {?>
+									<select id="prestige_record_approved">
+										<option>Submitted</option>
+										<option>Approved</option>
+										<?php if($can_audit) { ?><option>Audited</option> <?php } ?>
+										<option>Rejected</option>
+									</select>
+									<!--
+									<div class="btn-group btn-group-toggle btn-group-vertical" data-toggle="buttons">
 										<label class="prestige-record-approved btn btn-secondary active">
 											<input type="radio" name="prestige_record_approved" id="option1" value="Submitted"/> Submitted
 										</label>
@@ -42,6 +58,7 @@
 											<input type="radio" name="prestige_record_approved" id="prestige_record_approved_rejected" value="Rejected"/> Rejected
 										</label>
 									</div>
+									-->
 									<?php } ?></td>
 								<td>
 									<button class="btn btn-primary" id="prestige_record_note_btn">Add note</button>

@@ -1,6 +1,7 @@
 (function( $ ) {
 	'use strict';
 	let users_json = null,
+		offices = null,
 		$row = null;
 	
 	$(function(){
@@ -18,6 +19,7 @@
 	function parseJSONElements()
 	{
 		users_json = parseJSONElement('users_json');
+		offices = parseJSONElement('officers_json');
 	}
 	
 	function bindEventHandlers()
@@ -28,7 +30,7 @@
 	
 	function bindNotesButtons()
 	{
-		$('.prestige-note-button').off().click(showNotes);
+		$('.prestige-note-button').off().click({offices:offices}, Prestige.showNotesModal);
 	}
 	
 	function fetchPrestigeLog()
@@ -116,9 +118,9 @@
 		let data = {
 				'action':				'add_prestige_note',
 				'note_text':			$('#prestige_record_note').val(),
-				'status':				$('input[name=prestige_record_approved]:checked').val(),
+				'status':				$('#prestige_record_approved').val(),
 				'id_prestige_record':	$('#notes_prestige_record_id').val(),
-				'id_acting_officer':	$('#acting_office').val()
+				'id_acting_officer':	$('#prestige_record_id_officers').val()
 			},
 			$dtRow = $dataTable.row($row),
 			rowData = $dtRow.data();

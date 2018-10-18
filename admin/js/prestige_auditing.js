@@ -166,14 +166,14 @@
 	function bindEvents()
 	{
 		$('#prestige_record_note_btn').click(addPrestigeNote);
-		$('#addPrestigeReward').click(()=>{Prestige.showClaimModal(offices)});
+		$('#addPrestigeReward').click(()=>{Prestige.showClaimModal(offices);});
 		$('#prestige_reward_form').submit(()=>{handleNewPrestigeReward(); return false;});
 		bindNotesButtons();
 	}
 	
 	function bindNotesButtons()
 	{
-		$('.prestige-note-button').off().click(Prestige.showNotesModal);
+		$('.prestige-note-button').off().click({offices:offices}, Prestige.showNotesModal);
 	}
 	
 	function addPrestigeNote()
@@ -181,8 +181,9 @@
 		let data = {
 				'action':				'add_prestige_note',
 				'note_text':			$('#prestige_record_note').val(),
-				'status':				$('input[name=prestige_record_approved]:checked').val(),
-				'id_prestige_record':	$('#notes_prestige_record_id').val()
+				'status':				$('#prestige_record_approved').val(),
+				'id_prestige_record':	$('#notes_prestige_record_id').val(),
+				'id_acting_officer':	$('#prestige_record_id_officers').val()
 			},
 			$dtRow = $dataTable.row($row),
 			rowData = $dtRow.data();

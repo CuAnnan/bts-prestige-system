@@ -1,4 +1,8 @@
 <script type="text/json" id="users_json"><?php echo json_encode($users); ?></script>
+<script type="text/json" id="officers_json"><?php echo json_encode($offices); ?></script>
+<script type="text/javascript">
+	var user_id = <?php echo get_current_user_id(); ?>;
+</script>
 
 <div class="wrap">
 	<h5>Prestige Log Search</h5>

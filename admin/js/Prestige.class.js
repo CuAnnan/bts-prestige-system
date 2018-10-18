@@ -63,31 +63,26 @@
 		
 		static populateOfficesSelect($offices, offices)
 		{
-			console.log($offices);
 			if(!$offices)
 			{
 				return;
 			}
 			let userOffices = offices.filter((office)=>office.id_users == user_id),
 				relevantOffices = offices.filter((office)=>office.id === $("#id-acting-office").val());
+			
 			$offices.empty();
 			$('<option>---</option>').appendTo($offices);
-			$('<optgroup/>').prop('label', 'Original office').append(arrayToOptions(relevantOffices, 'title')).appendTo($offices);
-			$('<optgroup/>').prop('label', 'My offices').append(arrayToOptions(userOffices, 'title')).appendTo($offices)
+			$('<optgroup/>').prop('label', 'Original office').append(arrayToOptions(relevantOffices, 'full_title')).appendTo($offices);
+			$('<optgroup/>').prop('label', 'My offices').append(arrayToOptions(userOffices, 'full_title')).appendTo($offices)
 		}
 		
-		static showNotesModal()
+		static showNotesModal(event)
 		{
 			let $button = $(this);
 			$row = $button.closest('tr');
 			let	data = $row.data(),
 				notes = data.notes,
-				$notesTable =$('#prestige-notes').empty(),
-				currentStatus = notes[notes.length - 1].note_status,
-				$status_button = $(`input[name='prestige_record_approved'][value='${currentStatus}']`);
-			$('.prestige-record-approved').removeClass('active');
-			$status_button.prop('checked', true);
-			$status_button.closest('.prestige-record-approved').addClass('active');
+				$notesTable =$('#prestige-notes').empty();
 			$('#prestige_record_approved').val('Submitted');
 			$('#notes_prestige_record_id').val(data.id);
 			for(let note of notes)
@@ -97,9 +92,15 @@
 					.append($('<td/>').text(note.note_officer_title?`${note.note_officer_title} ${note.note_domain_name}`:''))
 					.append($('<td/>').text(note.member))
 					.append($('<td/>').text(note.status))
-					.append($('<td/>').text(note.note_date))
+					.append($('<td/>').text(note.note_date.split(' ')[0]))
 					.appendTo($notesTable);
 			}
+			if(event.data)
+			{
+				Prestige.populateOfficesSelect($('#prestige_record_id_officers'), event.data.offices);
+				$('#prestige_record_id_officers').val($("#id-acting-office").val());
+			}
+			
 			$('#prestigeNotesModalDialog').modal('show');
 			$notesModal.modal('show');
 		}

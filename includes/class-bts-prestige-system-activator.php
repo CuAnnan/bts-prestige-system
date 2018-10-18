@@ -107,6 +107,7 @@ class Bts_Prestige_System_Activator {
 			'genres'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
 				'name varchar(255)',
+				'short_name varchar(10) NULL',
 				'PRIMARY KEY  (id)'
 			],
 			'venues'=>[
@@ -120,10 +121,17 @@ class Bts_Prestige_System_Activator {
 				"FOREIGN KEY (id_domains) REFERENCES {$prefix}domains(id)",
 				"FOREIGN KEY (id_genres) REFERENCES {$prefix}genres(id)",
 			],
+			'offices'=>[
+				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
+				'title varchar(255)',
+				'short_form varchar(10)',
+				'PRIMARY KEY  (id)',
+			],
 			'officers'=>[
 				'id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT',
 				'id_venues bigint(20) UNSIGNED',
 				'id_domains bigint(20) UNSIGNED',
+				'id_offices bigint(20) UNSIGNED',
 				'id_users bigint(20) UNSIGNED',
 				'id_superior bigint(20) UNSIGNED',
 				'title varchar(255)',
@@ -134,6 +142,7 @@ class Bts_Prestige_System_Activator {
 				"FOREIGN KEY (id_users) REFERENCES {$wpdb->prefix}users(ID)",
 				"FOREIGN KEY (id_venues) REFERENCES {$prefix}venues(id)",
 				"FOREIGN KEY (id_domains) REFERENCES {$prefix}domains(id)",
+				"FOREIGN KEY (id_offices) REFERENCES {$prefix}offices(id)",
 				"FOREIGN KEY (id_superior) REFERENCES {$prefix}officers(id)",
 			],
 			'prestige_categories'=>[

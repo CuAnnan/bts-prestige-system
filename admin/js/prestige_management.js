@@ -89,7 +89,18 @@
 	function bindNotesButtons()
 	{
 		$('.prestige-note-button').off().click(Prestige.showNotesModal);
-		$('.prestige-edit-button').off().click(showEditClaimModal);
+		$('.prestige-edit-button').off().click(showEditClaimModal).removeAttr('disabled').each(
+			(index, item)=>
+			{
+				let	$button = $(item),
+					$tr = $button.closest('tr');
+				if($('.prestigeClaimStatus', $tr).text()==='Audited')
+				{
+					$button.attr('disabled', 'disabled');
+				}
+			}
+		);
+		
 	}
 	
 	function showEditClaimModal()
@@ -221,6 +232,10 @@
 					{
 						return data.split(" ")[0];
 					}
+				},
+				{
+					targets:8,
+					className:'prestigeClaimStatus'
 				}
 			],
 			createdRow:function(row, data, dataIndex)

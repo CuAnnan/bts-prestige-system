@@ -8,7 +8,8 @@
 		venues = null,
 		offices = null,
 		prestigeLog = null,
-		$dataTable = null;
+		$dataTable = null,
+		$dataTableRow = null;
 	
 	$(function(){
 		parseJSONElements();
@@ -79,32 +80,87 @@
 	{
 		$('#prestige_record_note_btn').click(addPrestigeNote);
 		$('#prestige_claim_button').click(showPrestigeClaimForm);
-		$('#newPrestigeRecordForm').on('submit', ()=>{validateAndSubmitPrestigeClaimForm(); return false;});
+		$('#newPrestigeRecordButton').on('click', validateAndSubmitPrestigeClaim);
+		$('#editPrestigeRecordButton').on('click', editPrestigeClaim);
 		$('#chain').change(populateOffices);
-		Prestige.bindNotesButtons();
+		bindNotesButtons();
 	}
 	
 	function bindNotesButtons()
 	{
 		$('.prestige-note-button').off().click(Prestige.showNotesModal);
+		$('.prestige-edit-button').off().click(showEditClaimModal);
 	}
 	
-	function validateAndSubmitPrestigeClaimForm()
+	function showEditClaimModal()
+	{
+		$dataTableRow = $dataTable.row($(this).parents('tr'));
+		let data = $dataTableRow.data();
+		Prestige.showEditClaimModal(offices, data);
+	}
+	
+	function editPrestigeClaim()
 	{
 		let officer = offices.filter((office)=>office.id === $('#id_officers').val())[0],
-			venue = officer.id_venues?venues.filter((venue)=>venue.id == officer.id_venues)[0]:null;
-		
-		let data = {
-				action: 'add_prestige_record',
+			venue = officer.id_venues?venues.filter((venue)=>venue.id == officer.id_venues)[0]:null,
+			domainName = $('#id_domains option:selected').text(),
+			genreName = venue?venue.genre:null,
+			data = {
+				action: Prestige.getClaimModalAction(),
+				id_officers:$('#id_officers').val(),
+				id_prestige_actions:$('#id_prestige_actions').val(),
+				reward_amount:parseInt($('#prestige_amount').val()),
+				reward_type:$('input[name=prestige_type]:checked').val(),
+				date_claimed:$('#claim_date').val(),
+				id_prestige_record:$('#id_prestige_record').val(),
+			};
+			
+		$.post(
+			ajaxurl,
+			data,
+			function(response)
+			{
+				if(response.success)
+				{
+					let rowData = $dataTableRow.data();
+					for(let key in data)
+					{
+						rowData[key] = data[key];
+					}
+					let otherFields = {
+						domain_name:domainName,
+						genre_name:genreName,
+						officer_title:officer.title,
+						description: $('#id_prestige_actions option:selected').text(),
+						category:$('#id_prestige_categories option:selected').text()
+					};
+					for(let key in otherFields)
+					{
+						rowData[key] = otherFields[key];
+					}
+					$dataTableRow.data(rowData).draw();
+					bindNotesButtons();
+					$prestigeModal.modal('hide');
+				}
+			}
+		);
+	}
+	
+	function validateAndSubmitPrestigeClaim()
+	{
+		let officer = offices.filter((office)=>office.id === $('#id_officers').val())[0],
+			venue = officer.id_venues?venues.filter((venue)=>venue.id == officer.id_venues)[0]:null,
+			domainName = $('#id_domains option:selected').text(),
+			genreName = venue?venue.genre:null,
+			data = {
+				action: Prestige.getClaimModalAction(),
 				id_officers:$('#id_officers').val(),
 				id_prestige_actions:$('#id_prestige_actions').val(),
 				prestige_amount:parseInt($('#prestige_amount').val()),
 				prestige_type:$('input[name=prestige_type]:checked').val(),
 				reason:$('#prestige_reason').val(),
 				date:$('#claim_date').val()
-			},
-			domainName = $('#id_domains option:selected').text(),
-			genreName = venue?venue.genre:null;
+			};
 		$.post(
 			ajaxurl,
 			data,
@@ -138,24 +194,7 @@
 	
 	function showPrestigeClaimForm()
 	{
-		let now = new Date(),
-			day = ("0" + now.getDate()).slice(-2),
-			month = ("0" + (now.getMonth() + 1)).slice(-2),
-			year = now.getFullYear();
-		
-		$('#id_prestige_categories').val('');
-		$('#id_domains').val('');
-		$('#id_prestige_actions').empty();
-		$('.prestige-type').removeClass('active');
-		$('input[name=prestige_type][value=Open]')
-			.prop("checked", true)
-			.closest('.prestige-type')
-			.addClass('active');
-		$('#claim_date').val(`${year}-${month}-${day}`);
-		$('#id_venues').empty();
-		$('#prestige_reason').val('');
-		$('#prestige_amount').val('');
-		$prestigeModal.modal('show');
+		Prestige.showClaimModal(offices);
 	}
 	
 	function buildDataTable()
@@ -172,7 +211,8 @@
 				{data:'domain_name'},
 				{data:'genre_name'},
 				{data:'status'},
-				{data:null, orderable:false, defaultContent:`<button class="btn btn-primary prestige-note-button">Notes</button>`}
+				{data:null, orderable:false, defaultContent:`<button class="btn btn-primary prestige-note-button">Notes</button>`},
+				{data:null, orderable:false, defaultContent:`<button class="btn btn-primary prestige-edit-button">Edit</button>`}
 			],
 			columnDefs:[
 				{
@@ -191,26 +231,6 @@
 		});
 	}
 	
-	function showNotes()
-	{
-		let $button = $(this),
-			$row = $button.closest('tr'),
-			data = $row.data(),
-			notes = data.notes,
-			$notesTable =$('#prestige-notes').empty();
-		$('#prestige_record_approved').val('Submitted');
-		$('#notes_prestige_record_id').val(data.id);
-		for(let note of notes)
-		{
-			$('<tr/>')
-				.append($('<td/>').text(note.note))
-				.append($('<td/>').text(note.status))
-				.append($('<td/>').text(note.note_date))
-				.appendTo($notesTable);
-		}
-		$('#prestigeNotesModalDialog').modal('show');
-	}
-	
 	function addPrestigeNote()
 	{
 		let data = {
@@ -224,7 +244,7 @@
 			data,
 			function(response)
 			{
-				$('#prestigeNotesModalDialog').modal('close');
+				$('#prestigeNotesModalDialog').modal('hide');
 			}
 		);
 	}

@@ -214,6 +214,19 @@ class Admin
 		));
 	}
 	
+	public function edit_prestige_record()
+	{
+		$this->return_json(Prestige::edit_prestige_record(
+			filter_input(INPUT_POST, 'id_prestige_record'),
+			filter_input(INPUT_POST, 'id_officers'),
+			filter_input(INPUT_POST, 'id_prestige_actions'),
+			filter_input(INPUT_POST, 'reward_amount'),
+			filter_input(INPUT_POST, 'reward_type'),
+			filter_input(INPUT_POST, 'status'),
+			filter_input(INPUT_POST, 'date_claimed')
+		));
+	}
+	
 	public function update_office()
 	{
 		$this->return_json(\BTS_Prestige\Admin\Offices::update_office(

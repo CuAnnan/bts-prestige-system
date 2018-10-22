@@ -1,13 +1,14 @@
 <div class="modal" id="newPrestigeRecordModalDialog" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 		<div class="modal-content">
-			<form id="newPrestigeRecordForm">
+			<form id="newPrestigeRecordForm" onsubmit="return false;">
 				<div class="modal-header">
-					<h5>New Prestige Record</h5>
+					<h5 id="prestige_claim_h5">New Prestige Record</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				</div>
 				<div class="modal-body">
 					<div class="container">
+						<input type="hidden" id="id_prestige_record"/>
 						<?php if(!isset($viewing_own_log)){?>
 						<div class="form-group row">
 							<label class="col-form-label col-4" for="prestige_reward_id_officers">Acting Office:</label>
@@ -85,31 +86,32 @@
 								<input type="date" id="claim_date" class="form-control"/>
 							</div>
 						</div>
-						<?php if(isset($viewing_own_log)) { ?>
-						<div class="form-group row">
-							<label class="col-form-label col-4" for="chain">Chain</label>
-							<div class="col">
-								<select class="form-control" id="chain">
-									<option>Coordinator</option>
-									<option>Storyteller</option>
-								</select>
+						<div id="prestige_claim_chain_and_office"<?php if(!isset($viewing_own_log)) { ?> style="display:none"<?php } ?>>
+							<div class="form-group row">
+								<label class="col-form-label col-4" for="chain">Chain</label>
+								<div class="col">
+									<select class="form-control" id="chain">
+										<option>Coordinator</option>
+										<option>Storyteller</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-form-label col-4" for="id_domains">Domain</label>
+								<div class="col"><select class="form-control" id="id_domains" required></select></div>
+							</div>
+							<div class="form-group row">
+								<label class="col-form-label col-4" for="id_officers">Office</label>
+								<div class="col">
+									<select class="form-control" id="id_officers" required></select>
+								</div>
 							</div>
 						</div>
-						<div class="form-group row">
-							<label class="col-form-label col-4" for="id_domains">Domain</label>
-							<div class="col"><select class="form-control" id="id_domains" required></select></div>
-						</div>
-						<div class="form-group row">
-							<label class="col-form-label col-4" for="id_officers">Office</label>
-							<div class="col">
-								<select class="form-control" id="id_officers" required></select>
-							</div>
-						</div>
-						<?php } ?>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="submit" class="btn btn-primary" id="newPrestigeRecordButton">Add Record</button>
+					<button class="btn btn-primary" id="newPrestigeRecordButton">Add Record</button>
+					<button class="btn btn-primary" display="style:none" id="editPrestigeRecordButton">Update Record</button>
 					<button class="btn btn-warning" data-dismiss="modal">Cancel</button>
 				</div>
 			</form>

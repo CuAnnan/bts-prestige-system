@@ -107,7 +107,10 @@ class Prestige
 	{
 		$id_users = get_current_user_id();
 		$now = date("Y-m-d H:i:s");
-		self::set_prestige_record_status($id_prestige_record, $status);
+		if($status)
+		{
+			self::set_prestige_record_status($id_prestige_record, $status);
+		}
 		return self::add_record_note($id_prestige_record, $id_users, $note_text, $now, $status, $id_officer);
 	}
 	
@@ -152,6 +155,59 @@ class Prestige
 		return ['success'=>false, 'message'=>$wpdb->last_error];
 	}
 	
+	public static function edit_prestige_record($id_prestige_record, $id_officer_approved, $id_prestige_action, $reward_amount, $reward_type, $status, $date)
+	{
+		global $wpdb;
+		$table = $wpdb->prefix.BTS_TABLE_PREFIX."prestige_rewards";
+		
+		$problems = self::get_edit_record_problems($id_prestige_record);
+		if($problems)
+		{
+			return $problems;
+		}
+		
+		$updates = ["id_officer_approved"=>$id_officer_approved,"id_prestige_action"=>$id_prestige_action,"date_claimed"=>$date,"reward_amount"=>$reward_amount,"reward_type"=>$reward_type];
+		if($status)
+		{
+			$updates['status'] = $status;
+		}
+		
+		$wpdb->update(
+			$table,
+			$updates,
+			["id"=>$id_prestige_record]
+		);
+		
+		return ['success'=>'true'];
+	}
+	
+	public static function get_edit_record_problems($id_prestige_record)
+	{
+		global $wpdb;
+		$user = wp_get_current_user();
+		$records_check = $wpdb->get_results($wpdb->prepare("select id_member, status FROM {$wpdb->prefix}".BTS_TABLE_PREFIX."prestige_rewards WHERE id = %d", $id_prestige_record))[0];
+		if($records_check->status == "Audited")
+		{
+			return ["success"=>false, "reason"=>"Cannot update audited records"];
+		}
+		
+		$user_can_update = $records_check->id_member == $user->ID;
+		$results = ["id_record"=>$id_prestige_record,"id_record_user"=>$records_check->id_member,"user id"=>$user->ID, "record"=>$records_check];
+		if(!$user_can_update)
+		{
+			$roles = (array)$user->roles;
+			$user_can_update = boolval(array_intersect(['administrator', BTS_PRESTIGE_MANAGEMENT_ROLE, BTS_NATIONAL_OFFICE_ROLE], (array)$user->roles));
+			$results['roles'] = $roles;
+		}
+		
+		if(!$user_can_update)
+		{
+			return ['success'=>false, "reason"=>"Logged in user does not have permissions to update this record", "results"=>$results];
+		}
+		
+		return false;
+	}
+	
 	public static function get_audited_prestige($id_users)
 	{
 		global $wpdb;
@@ -170,7 +226,7 @@ class Prestige
 	
 	public static function cooerce_record_to_object($record)
 	{
-		$basic_fields = ["id", "officer_id_user", "member_id_user", "reward_amount", "reward_type", "date_claimed", "description", "category", "officer_title", "id_officers", "domain_name", "genre_name", "status"];
+		$basic_fields = ["id", "officer_id_user", "member_id_user", "reward_amount", "reward_type", "date_claimed", "description", "id_prestige_actions", "id_prestige_categories", "category", "officer_title", "id_officers", "domain_name", "genre_name", "status", "id_officers"];
 		$ordered_record = new \stdClass();
 		$ordered_record->notes = [];
 		foreach($basic_fields as $basic_field)
@@ -208,6 +264,8 @@ class Prestige
 				pr.date_claimed			AS date_claimed,
 				pr.status				AS status,
 				pa.description			AS description,
+				pa.id					AS id_prestige_actions,
+				pc.id					AS id_prestige_categories,
 				pc.name					AS category,
 				o.title					AS officer_title,
 				o.id					AS id_officers,
@@ -383,6 +441,8 @@ class Prestige
 				pr.date_claimed			AS date_claimed,
 				pr.status				AS status,
 				pa.description			AS description,
+				pa.id					AS id_prestige_actions,
+				pc.id					AS id_prestige_categories,
 				pc.name					AS category,
 				o.title					AS officer_title,
 				o.id					AS id_officers,
@@ -415,7 +475,8 @@ class Prestige
 				LEFT JOIN	{$prefix}domains dn					ON (dn.id		= n_o.id_domains)
 				LEFT JOIN	{$prefix}genres dg					ON (dg.id		= vn.id_genres)
 			WHERE
-				pr.status  IN ('Submitted', 'Approved')";
+				pr.status NOT IN ('Audited', 'Rejected')
+				OR pr.status IS NULL";
 		
 		if(!array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles))
 		{

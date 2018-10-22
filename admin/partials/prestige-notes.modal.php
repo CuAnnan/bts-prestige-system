@@ -41,24 +41,7 @@
 										<?php if($can_audit) { ?><option>Audited</option> <?php } ?>
 										<option>Rejected</option>
 									</select>
-									<!--
-									<div class="btn-group btn-group-toggle btn-group-vertical" data-toggle="buttons">
-										<label class="prestige-record-approved btn btn-secondary active">
-											<input type="radio" name="prestige_record_approved" id="option1" value="Submitted"/> Submitted
-										</label>
-										<label class="prestige-record-approved btn btn-secondary">
-											<input type="radio" name="prestige_record_approved" id="option2" value="Approved"/> Approved
-										</label>
-										<?php if($can_audit) { ?>
-											<label class="prestige-record-approved btn btn-secondary">
-												<input type="radio" name="prestige_record_approved" id="option3" value="Audited"/> Audited
-											</label>
-										<?php } ?>
-										<label class="prestige-record-approved btn btn-danger">
-											<input type="radio" name="prestige_record_approved" id="prestige_record_approved_rejected" value="Rejected"/> Rejected
-										</label>
-									</div>
-									-->
+									
 									<?php } ?></td>
 								<td>
 									<button class="btn btn-primary" id="prestige_record_note_btn">Add note</button>

@@ -9,7 +9,7 @@
 		prestigeRecords = null,
 		users = null,
 		$row = null,
-		$dataTable = null;
+		$currentDataTable = null;
 	
 	$(function(){
 		parseJSONElements();
@@ -42,16 +42,16 @@
 				tabTitle = record.office.short_form + (venue?`-${venue.short_name}`:'')+ (domain.nmc_code?` (${domain.nmc_code})`:''),
 				officeAndDomain = record.office.title +(venue?`-${venue.genre}`:'') + (domain.name?` (${domain.name})`:''),
 				idPrefix = `record_${record.office.id}`,
+				$tabContent = $(`<div class="tab-pane fade" id="${idPrefix}" role="tabpanel" aria-labelledby="nav-profile-tab"></div>`).appendTo($recordsTabs),
+				$dataTableContainer = $(`<table id="${idPrefix}_prestige_table"><thead><tr><th>Member</th><th>Action</th><th>Category</th><th>Amount</th><th>Type</th><th>Date Claimed</th><th>Awarding Officer</th><th>Domain</th><th>Venue</th><th>Approved</th><th>&nbsp;</th></tr></thead><tbody></tbody></table>`).appendTo($tabContent),
+				$dataTable = buildTabDataTable($dataTableContainer, record),
 				$tabNav = $(`<li class="nav-item" data-id-officer="${record.office.id}"><a title="${officeAndDomain}" class="nav-link" id="${idPrefix}-tab" data-toggle="tab" href="#${idPrefix}" role="tab" aria-controls="profile" aria-selected="${firstRecord}">${tabTitle}</a></li>`)
 							.appendTo($recordsNav)
 							.click(function(){
 								let $node = $(this);
 								$('#id-acting-office').val($node.data('idOfficer'));
-							}),
-				$tabContent = $(`<div class="tab-pane fade" id="${idPrefix}" role="tabpanel" aria-labelledby="nav-profile-tab"></div>`).appendTo($recordsTabs),
-				$dataTableContainer = $(`<table id="${idPrefix}_prestige_table"><thead><tr><th>Member</th><th>Action</th><th>Category</th><th>Amount</th><th>Type</th><th>Date Claimed</th><th>Awarding Officer</th><th>Domain</th><th>Venue</th><th>Approved</th><th>&nbsp;</th></tr></thead><tbody></tbody></table>`);
-				$dataTableContainer.appendTo($tabContent),
-				$dataTable = buildTabDataTable($dataTableContainer, record);
+								$currentDataTable = $dataTable;
+							});
 			if(firstRecord)
 			{
 				$('a', $tabNav).addClass('active');
@@ -64,8 +64,8 @@
 	
 	function buildTabDataTable($dataTableContainer, record)
 	{
-		let user = (data)=> {return `${data.first_name} ${data.last_name} (${data.number})`;};
-		$dataTable = $dataTableContainer.DataTable({
+		let user = (data)=> `${data.first_name} ${data.last_name} (${data.number})`;
+		let $dataTable = $dataTableContainer.DataTable({
 			data:record.records,
 			autoWidth:false,
 			columns:[
@@ -79,7 +79,8 @@
 				{data:'domain_name'},
 				{data:'genre_name'},
 				{data:'status'},
-				{data:null, orderable:false, defaultContent:`<button class="btn btn-primary prestige-note-button">Notes</button>`}
+				{data:null, orderable:false, defaultContent:`<button class="btn btn-primary prestige-note-button">Notes</button>`},
+				{data:null, orderable:false, defaultContent:`<button class="btn btn-primary prestige-edit-button">Edit</button>`}
 			],
 			createdRow:function(row, data, dataIndex)
 			{
@@ -166,7 +167,7 @@
 	function bindEvents()
 	{
 		$('#prestige_record_note_btn').click(addPrestigeNote);
-		$('#addPrestigeReward').click(()=>{Prestige.showClaimModal(offices);});
+		$('#addPrestigeReward').click(showPrestigeClaimModal);
 		$('#prestige_reward_form').submit(()=>{handleNewPrestigeReward(); return false;});
 		bindNotesButtons();
 	}
@@ -174,6 +175,11 @@
 	function bindNotesButtons()
 	{
 		$('.prestige-note-button').off().click({offices:offices}, Prestige.showNotesModal);
+	}
+	
+	function showPrestigeClaimModal()
+	{
+		Prestige.setClaimModalAction('add_prestige_reward').showClaimModal(offices);
 	}
 	
 	function addPrestigeNote()
@@ -185,7 +191,7 @@
 				'id_prestige_record':	$('#notes_prestige_record_id').val(),
 				'id_acting_officer':	$('#prestige_record_id_officers').val()
 			},
-			$dtRow = $dataTable.row($row),
+			$dtRow = $currentDataTable.row($row),
 			rowData = $dtRow.data();
 			rowData.status = data.status;
 		
@@ -210,7 +216,7 @@
 	function handleNewPrestigeReward()
 	{
 		let data = {
-			'action':'add_prestige_reward',
+			'action':Prestige.getClaimModalAction(),
 			'id_users':$('#prestige_reward_id_user').val(),
 			'id_officers':$('#prestige_reward_id_officers').val(),
 			'id_prestige_actions':$('#prestige_reward_id_prestige_actions').val(),

@@ -26,6 +26,7 @@
 				<th>Venue</th>
 				<th>Approved</th>
 				<th>&nbsp;</th>
+				<th>&nbsp;</th>
 			</tr>
 		</thead>
 		<tbody></tbody>

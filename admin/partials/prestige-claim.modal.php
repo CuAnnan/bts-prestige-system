@@ -10,7 +10,7 @@
 					<div class="container">
 						<input type="hidden" id="id_prestige_record"/>
 						<?php if(!isset($viewing_own_log)){?>
-						<div class="form-group row">
+						<div class="form-group row" id="acting_office_container">
 							<label class="col-form-label col-4" for="prestige_reward_id_officers">Acting Office:</label>
 							<div class="col"><select id="prestige_reward_id_officers" class="form-control"></select></div>
 						</div>

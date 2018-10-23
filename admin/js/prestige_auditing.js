@@ -167,6 +167,16 @@
 	function buildPrestigeModal()
 	{
 		populateSelect('#id_prestige_categories', prestigeCategories, 'name', populateActions);
+		populateSelect('#id_domains', domains, 'name', populateOffices);
+	}
+	
+	function populateOffices()
+	{
+		// so, this one needs a bit of unpacking: any offices that are held by the admin user should be ignored.
+		// Any office that has no venue is a domain office. Any office that has a venue, the venue should be active.
+		// other than that, just match the domain to the chosen domain and the chain to the chosen chain.
+		let relevantOffices = offices.filter(office=>(office.id_users !== "1" && (!office.venue || (office.active && office.active === '1')) && office.id_domains === $('#id_domains').val() && office.chain === $('#chain').val()));
+		populateSelect('#id_officers', relevantOffices, 'full_title');
 	}
 	
 	function populateActions()
@@ -179,6 +189,7 @@
 		$('#prestige_record_note_btn').click(addPrestigeNote);
 		$('#addPrestigeReward').click(showPrestigeClaimModal);
 		$('#newPrestigeRecordButton').click(handleNewPrestigeReward);
+		$('#editPrestigeRecordButton').click(editPrestigeRecord);
 		bindNotesButtons();
 	}
 	
@@ -253,6 +264,30 @@
 				{
 					AdminPrestige.hideClaimModal();
 				}
+			}
+		);
+	}
+	
+	function editPrestigeRecord()
+	{
+		let dtData = ($dataTableRow.data()),
+			data = {
+				action: AdminPrestige.getClaimModalAction(),
+				id_officers:$('#id_officers').val(),
+				id_prestige_actions:$('#id_prestige_actions').val(),
+				reward_amount:parseInt($('#prestige_amount').val()),
+				reward_type:$('input[name=prestige_type]:checked').val(),
+				date_claimed:$('#claim_date').val(),
+				id_prestige_record:$('#id_prestige_record').val(),
+				status:$('input[name=prestige_reward_approved]:checked').val(),
+			};
+		
+		$.post(
+			ajaxurl,
+			data,
+			function(response)
+			{
+				AdminPrestige.hideClaimModal();
 			}
 		);
 	}

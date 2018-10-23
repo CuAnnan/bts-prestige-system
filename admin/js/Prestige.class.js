@@ -149,27 +149,37 @@
 	{
 		static showEditClaimModal(officers, claimData, members)
 		{
-			super.showEditClaimModal(officers, claimData);
 			let member = members.filter((member)=>member.id === claimData.member_id_user)[0];
+			$('#acting_office_container').hide();
 			$('#prestige_reward_user_search').val(`${member.first_name} ${member.last_name} (${member.membership_number})`).attr('disabled', 'disabled');
 			Prestige.populateOfficesSelect($('#prestige_reward_id_officers'), officers);
+			$('.prestige-reward-approved').removeClass('active');
+			$(`input[name=prestige_reward_approved][value=${claimData.status}]`)
+				.prop('checked', true)
+				.closest(".prestige-reward-approved")
+				.addClass('active');
 			$('#prestige_reward_id_officers').val($("#id-acting-office").val());
+			$('#prestige_claim_chain_and_office').show();
 			$('#prestige_reward_approved').val(claimData.status);
+			super.showEditClaimModal(officers, claimData);
+			return this;
 		}
 		
 		static showClaimModal(offices)
 		{
-			super.showClaimModal(offices);
 			$('#prestige_reward_user_search').val('').removeAttr('disabled');
 			$('#prestige_reward_id_officers').val($("#id-acting-office").val());
-			
+			$('#acting_office_container').show();
+			$('#prestige_claim_chain_and_office').hide();
+			super.showClaimModal(offices);
+			return this;
 		}
 		
 		static showNotesModal(event)
 		{
-			super.showNotesModal();
 			Prestige.populateOfficesSelect($('#prestige_record_id_officers'), event.data.offices);
 			$('#prestige_record_id_officers').val($("#id-acting-office").val());
+			super.showNotesModal();
 			return this;
 		}
 		

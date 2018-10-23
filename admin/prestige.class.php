@@ -177,7 +177,7 @@ class Prestige
 			["id"=>$id_prestige_record]
 		);
 		
-		return ['success'=>'true'];
+		return ['success'=>'true', "updates"=>$updates];
 	}
 	
 	public static function get_edit_record_problems($id_prestige_record)

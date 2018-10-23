@@ -205,7 +205,7 @@
 	
 	function showPrestigeClaimForm()
 	{
-		Prestige.showClaimModal(offices);
+		Prestige.setClaimModalAction('add_prestige_reward').showClaimModal(offices);
 	}
 	
 	function buildDataTable()

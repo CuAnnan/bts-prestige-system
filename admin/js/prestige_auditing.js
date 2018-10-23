@@ -9,7 +9,8 @@
 		prestigeRecords = null,
 		users = null,
 		$row = null,
-		$currentDataTable = null;
+		$currentDataTable = null,
+		$dataTableRow = null;
 	
 	$(function(){
 		parseJSONElements();
@@ -174,7 +175,15 @@
 	
 	function bindNotesButtons()
 	{
-		$('.prestige-note-button').off().click({offices:offices}, Prestige.showNotesModal);
+		$('.prestige-note-button').off().click(Prestige.showNotesModal);
+		$('.prestige-edit-button').off().click(showEditClaimModal);
+	}
+	
+	function showEditClaimModal()
+	{
+		$dataTableRow = $currentDataTable.row($(this).parents('tr'));
+		let data = $dataTableRow.data();
+		Prestige.showEditClaimModal(offices, data);
 	}
 	
 	function showPrestigeClaimModal()

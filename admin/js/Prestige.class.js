@@ -76,7 +76,6 @@
 		static showClaimModal(offices)
 		{
 			$('#prestige_claim_h5').text('New Prestige Record');
-			this.setClaimModalAction('add_prestige_reward');
 			
 			let now = new Date(),
 			day = ("0" + now.getDate()).slice(-2),

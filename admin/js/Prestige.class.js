@@ -93,7 +93,6 @@
 				.addClass('active');
 			$('#claim_date').val(`${year}-${month}-${day}`);
 			Prestige.populateOfficesSelect($('#prestige_reward_id_officers'), offices);
-			$('#prestige_reward_id_officers').val($("#id-acting-office").val());
 			$('#editPrestigeRecordButton').hide();
 			$('#newPrestigeRecordButton').show();
 			$claimModal.modal('show');
@@ -116,7 +115,7 @@
 			
 		}
 		
-		static showNotesModal(event)
+		static showNotesModal()
 		{
 			let $button = $(this);
 			$row = $button.closest('tr');
@@ -136,17 +135,46 @@
 					.appendTo($notesTable);
 			}
 			$('#prestige_record_note').val('');
-			if(event.data)
-			{
-				Prestige.populateOfficesSelect($('#prestige_record_id_officers'), event.data.offices);
-				$('#prestige_record_id_officers').val($("#id-acting-office").val());
-			}
-			
-			$('#prestigeNotesModalDialog').modal('show');
 			$notesModal.modal('show');
 			return this;
 		}
+		
+		static hideClaimModal()
+		{
+			$claimModal.modal('hide');
+		}
+	}
+	
+	class AdminPrestige extends Prestige
+	{
+		static showEditClaimModal(officers, claimData, members)
+		{
+			super.showEditClaimModal(officers, claimData);
+			let member = members.filter((member)=>member.id === claimData.member_id_user)[0];
+			$('#prestige_reward_user_search').val(`${member.first_name} ${member.last_name} (${member.membership_number})`).attr('disabled', 'disabled');
+			Prestige.populateOfficesSelect($('#prestige_reward_id_officers'), officers);
+			$('#prestige_reward_id_officers').val($("#id-acting-office").val());
+			$('#prestige_reward_approved').val(claimData.status);
+		}
+		
+		static showClaimModal(offices)
+		{
+			super.showClaimModal(offices);
+			$('#prestige_reward_user_search').val('').removeAttr('disabled');
+			$('#prestige_reward_id_officers').val($("#id-acting-office").val());
+			
+		}
+		
+		static showNotesModal(event)
+		{
+			super.showNotesModal();
+			Prestige.populateOfficesSelect($('#prestige_record_id_officers'), event.data.offices);
+			$('#prestige_record_id_officers').val($("#id-acting-office").val());
+			return this;
+		}
+		
 	}
 	
 	window.Prestige = Prestige;
+	window.AdminPrestige = AdminPrestige;
 })(jQuery);

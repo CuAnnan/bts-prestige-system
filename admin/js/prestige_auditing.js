@@ -25,7 +25,10 @@
 		let recordsByOffice = {},
 			$recordsNav = $('#recordsNav'),
 			$recordsTabs = $('#recordsTabs'),
-			firstRecord = true;
+			firstRecord = true,
+			nrc = offices.filter((office)=>office.short_form === 'NRC')[0];
+		recordsByOffice[nrc.id] = {office:nrc, records:[]};
+		
 		for(let record of prestigeRecords)
 		{
 			let office = offices.filter((office)=>office.id === record.id_officers)[0];
@@ -34,6 +37,10 @@
 				recordsByOffice[office.id] = {office:office,records:[]};
 			}
 			recordsByOffice[office.id].records.push(record);
+			if(record.status==='Approved')
+			{
+				recordsByOffice[nrc.id].records.push(record);
+			}
 		}
 		
 		for(let record of Object.values(recordsByOffice))
@@ -58,6 +65,7 @@
 				$('a', $tabNav).addClass('active');
 				$tabContent.addClass('active').addClass('show');
 				$('#id-acting-office').val($tabNav.data('idOfficer'));
+				$currentDataTable = $dataTable;
 			}
 			firstRecord = false;
 		}
@@ -86,6 +94,7 @@
 			createdRow:function(row, data, dataIndex)
 			{
 				$(row).data({notes:data.notes, id:data.id});
+				
 			},
 			order:[[4, 'desc']]
 		});
@@ -157,25 +166,25 @@
 	
 	function buildPrestigeModal()
 	{
-		populateSelect('#prestige_reward_id_prestige_categories', prestigeCategories, 'name', populateActions);
+		populateSelect('#id_prestige_categories', prestigeCategories, 'name', populateActions);
 	}
 	
 	function populateActions()
 	{
-		populateSelect('#prestige_reward_id_prestige_actions', prestigeActions.filter(action => action.id_prestige_category === $('#prestige_reward_id_prestige_categories').val()), 'description');
+		populateSelect('#id_prestige_actions', prestigeActions.filter(action => action.id_prestige_category === $('#id_prestige_categories').val()), 'description');
 	}
 	
 	function bindEvents()
 	{
 		$('#prestige_record_note_btn').click(addPrestigeNote);
 		$('#addPrestigeReward').click(showPrestigeClaimModal);
-		$('#prestige_reward_form').submit(()=>{handleNewPrestigeReward(); return false;});
+		$('#newPrestigeRecordButton').click(handleNewPrestigeReward);
 		bindNotesButtons();
 	}
 	
 	function bindNotesButtons()
 	{
-		$('.prestige-note-button').off().click(Prestige.showNotesModal);
+		$('.prestige-note-button').off().click(function(){$dataTableRow = $currentDataTable.row($(this).closest('tr'));}).click({offices:offices}, AdminPrestige.showNotesModal);
 		$('.prestige-edit-button').off().click(showEditClaimModal);
 	}
 	
@@ -183,12 +192,12 @@
 	{
 		$dataTableRow = $currentDataTable.row($(this).parents('tr'));
 		let data = $dataTableRow.data();
-		Prestige.showEditClaimModal(offices, data);
+		AdminPrestige.showEditClaimModal(offices, data, users);
 	}
 	
 	function showPrestigeClaimModal()
 	{
-		Prestige.setClaimModalAction('add_prestige_reward').showClaimModal(offices);
+		AdminPrestige.setClaimModalAction('add_prestige_reward').showClaimModal(offices);
 	}
 	
 	function addPrestigeNote()
@@ -200,10 +209,9 @@
 				'id_prestige_record':	$('#notes_prestige_record_id').val(),
 				'id_acting_officer':	$('#prestige_record_id_officers').val()
 			},
-			$dtRow = $currentDataTable.row($row),
-			rowData = $dtRow.data();
+			rowData = $dataTableRow.data();
+			
 			rowData.status = data.status;
-		
 		$.post(
 			ajaxurl,
 			data,
@@ -211,11 +219,11 @@
 			{
 				if(data.status === 'Audited' || data.status === 'Rejected')
 				{
-					$dtRow.remove().draw();
+					$dataTableRow.remove().draw();
 				}
 				else
 				{
-					$dtRow.data(rowData).draw();
+					$dataTableRow.data(rowData).draw();
 				}
 				$('#prestigeNotesModalDialog').modal('hide');
 			}
@@ -225,16 +233,17 @@
 	function handleNewPrestigeReward()
 	{
 		let data = {
-			'action':Prestige.getClaimModalAction(),
+			'action':AdminPrestige.getClaimModalAction(),
 			'id_users':$('#prestige_reward_id_user').val(),
 			'id_officers':$('#prestige_reward_id_officers').val(),
-			'id_prestige_actions':$('#prestige_reward_id_prestige_actions').val(),
-			'reason':$('#prestige_reward_reason').val(),
-			'prestige_amount':$('#prestige_reward_amount').val(),
-			'prestige_type':$('input[name=prestige_reward_type]').val(),
+			'id_prestige_actions':$('#id_prestige_actions').val(),
+			'reason':$('#prestige_reason').val(),
+			'prestige_amount':$('#prestige_amount').val(),
+			'prestige_type':$('input[name=prestige_type]').val(),
 			'status':$('input[name=prestige_reward_approved]').val(),
-			'date':$('#prestige_reward_claim_date').val()
+			'date':$('#claim_date').val()
 		};
+		
 		$.post(
 			ajaxurl,
 			data,
@@ -242,7 +251,7 @@
 			{
 				if(response.success)
 				{
-					$('#prestigeAddModalDialog').modal('hide');
+					AdminPrestige.hideClaimModal();
 				}
 			}
 		);

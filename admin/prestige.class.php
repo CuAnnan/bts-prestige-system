@@ -117,7 +117,6 @@ class Prestige
 	public static function set_prestige_record_status($id_prestige_record, $status)
 	{
 		global $wpdb;
-		error_log("Updating status for record {$id_prestige_record} to be $status");
 		$table = $wpdb->prefix.BTS_TABLE_PREFIX."prestige_rewards";
 		$wpdb->update(
 			$table,

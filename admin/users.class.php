@@ -5,7 +5,6 @@ class Users
 	public static function getUsermeta()
 	{
 		$users = get_users(['fields'=>['id']]);
-		$usersMetaData = [];
 		return self::get_user_meta_array($users);
 	}
 	
@@ -32,7 +31,7 @@ class Users
 		$usersMetaData = [];
 		foreach($users as $user_id)
 		{
-			$meta = get_user_meta($user_id->id);
+			$meta = array_map( function( $a ){ return $a[0]; }, get_user_meta($user_id->id));
 			$meta['id'] = $user_id->id;
 			$usersMetaData[] = $meta;
 		}

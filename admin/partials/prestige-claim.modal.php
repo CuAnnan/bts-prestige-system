@@ -12,7 +12,7 @@
 						<?php if(!isset($viewing_own_log)){?>
 						<div class="form-group row">
 							<label class="col-form-label col-4" for="prestige_reward_id_officers">Acting Office:</label>
-							<div class="col"><select id="prestige_reward_id_officers"></select></div>
+							<div class="col"><select id="prestige_reward_id_officers" class="form-control"></select></div>
 						</div>
 						<div class="form-group row">
 							<label class="col-form-label col-4" for="prestige_reward_user_search">Member</label>
@@ -49,13 +49,13 @@
 							<div class="col">
 								<div class="btn-group btn-group-toggle" data-toggle="buttons">
 									<label class="prestige-type btn btn-secondary active">
-										<input type="radio" name="prestige_type" id="option1" value="Open" checked/> Open
+										<input type="radio" name="prestige_type" id="prestige_type_open" value="Open" checked/> Open
 									</label>
 									<label class="prestige-type btn btn-secondary">
-										<input type="radio" name="prestige_type" id="option2" value="Regional"/> Regional
+										<input type="radio" name="prestige_type" id="prestige_type_regional" value="Regional"/> Regional
 									</label>
 									<label class="prestige-type btn btn-secondary">
-										<input type="radio" name="prestige_type" id="option3" value="National"/> National
+										<input type="radio" name="prestige_type" id="prestige_type_national" value="National"/> National
 									</label>
 								</div>
 							</div>
@@ -76,6 +76,9 @@
 										<input type="radio" name="prestige_reward_approved" id="prestige_reward_approved_audited" value="Audited"/> Audited
 									</label>
 									<?php } ?>
+									<label class="prestige-reward-approved btn btn-danger">
+										<input type="radio" name="prestige_reward_approved" id="prestige_reward_approved_rejected" value="Rejected"/> Rejected
+									</label>
 								</div>
 							</div>
 						</div>

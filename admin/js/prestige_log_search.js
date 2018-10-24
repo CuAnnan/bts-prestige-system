@@ -2,7 +2,8 @@
 	'use strict';
 	let users_json = null,
 		offices = null,
-		$row = null;
+		$row = null,
+		editable = false;
 	
 	$(function(){
 		parseJSONElements();
@@ -44,6 +45,7 @@
 			data,
 			function(response)
 			{
+				editable = response.editable;
 				showDataTable(Object.values(response.log));
 			}
 		);
@@ -109,6 +111,14 @@
 				.append($('<td/>').text(note.status))
 				.append($('<td/>').text(note.note_date))
 				.appendTo($notesTable);
+		}
+		if(editable)
+		{
+			$('#prestige_record_note_btn').removeAttr('disabled');
+		}
+		else
+		{
+			$('#prestige_record_note_btn').attr('disabled', true);
 		}
 		$('#prestigeNotesModalDialog').modal('show');
 	}

@@ -181,10 +181,21 @@
 			$('#prestige_record_id_officers').val($("#id-acting-office").val());
 			super.showNotesModal();
 			return this;
+		}	
+	}
+	
+	class PrestigeSearch extends Prestige
+	{
+		static showClaimModal(offices)
+		{
+			super.showClaimModal(offices);
+			$('#prestige_reward_user_search').val($('#prestige_user_search').val()).attr('disabled', 'disabled');
+			
+			return this;
 		}
-		
 	}
 	
 	window.Prestige = Prestige;
 	window.AdminPrestige = AdminPrestige;
+	window.PrestigeSearch = PrestigeSearch;
 })(jQuery);

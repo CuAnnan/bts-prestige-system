@@ -406,6 +406,10 @@ class Prestige
 		$managed_domains		= Domains::get_managed_domain_ids();
 		$users					= Users::get_users_by_id_domains($managed_domains);
 		$offices				= \BTS_Prestige\Admin\Offices::get_all_offices();
+		$prestige_categories	= self::get_prestige_categories();
+		$prestige_actions		= self::get_prestige_actions();
+		$can_audit				= array_intersect(['administrator', BTS_NATIONAL_OFFICE_ROLE],  wp_get_current_user()->roles);
+		
 		require_once (plugin_dir_path(__FILE__).'partials/prestige-search-page.php');
 	}
 	

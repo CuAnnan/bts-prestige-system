@@ -2,14 +2,18 @@
 	'use strict';
 	let users_json = null,
 		offices = null,
+		prestigeCategories = null,
+		prestigeActions = null,
 		$row = null,
 		editable = false;
 	
 	$(function(){
+		$('input[type=hidden]').val('');
+		$('#prestige_user_search').val('');
 		parseJSONElements();
 		buildAutoComplete();
 		bindEventHandlers();
-		
+		buildPrestigeModal();
 	});
 	
 	function parseJSONElement(id)
@@ -21,24 +25,99 @@
 	{
 		users_json = parseJSONElement('users_json');
 		offices = parseJSONElement('officers_json');
+		prestigeCategories = parseJSONElement('prestige_categories_json');
+		prestigeActions = parseJSONElement('prestige_actions_json');
+	}
+	
+	function handleNewPrestigeReward()
+	{
+		let data = {
+			'action':PrestigeSearch.getClaimModalAction(),
+			'id_users':$('#prestige_id_users').val(),
+			'id_officers':$('#prestige_reward_id_officers').val(),
+			'id_prestige_actions':$('#id_prestige_actions').val(),
+			'reason':$('#prestige_reason').val(),
+			'prestige_amount':$('#prestige_amount').val(),
+			'prestige_type':$('input[name=prestige_type]').val(),
+			'status':$('input[name=prestige_reward_approved]').val(),
+			'date':$('#claim_date').val()
+		};
+		
+		$.post(
+			ajaxurl,
+			data,
+			function(response)
+			{
+				if(response.success)
+				{
+					PrestigeSearch.hideClaimModal();
+				}
+			}
+		);
+	}
+	
+	/**
+	 * Populates a select with a series of values. Option values are always set to the id of the field
+	 * @param {type} selector the jQuery selector
+	 * @param {type} fields	  the field to search for values
+	 * @param {type} fieldTitle the field property to populate the option text with 
+	 * @param {type} handler an optional change handler
+	 */
+	function populateSelect(selector, fields, fieldTitle, handler)
+	{
+		let $select = $(selector).empty(),
+			$options = [$('<option value="">---</option>')];
+		
+		for(let field of fields)
+		{
+			$options.push($(`<option value="${field.id}">${field[fieldTitle]}</option>`));
+		}
+		$select.append(...$options);
+		if(handler)
+		{
+			$select.change(handler);
+		}
+	}
+	
+	function buildPrestigeModal()
+	{
+		populateSelect('#id_prestige_categories', prestigeCategories, 'name', populateActions);
+	}
+	
+	function populateActions()
+	{
+		populateSelect('#id_prestige_actions', prestigeActions.filter(action => action.id_prestige_category === $('#id_prestige_categories').val()), 'description');
 	}
 	
 	function bindEventHandlers()
 	{
 		$('#prestige_search_button').click(fetchPrestigeLog);
 		$('#prestige_record_note_btn').click(addPrestigeNote);
+		$('#addPrestigeReward').click(showPrestigeClaimModal);
+		$('#newPrestigeRecordButton').click(handleNewPrestigeReward);
+	}
+	
+	function showPrestigeClaimModal()
+	{
+		PrestigeSearch.setClaimModalAction('add_prestige_reward').showClaimModal(offices);
 	}
 	
 	function bindNotesButtons()
 	{
-		$('.prestige-note-button').off().click({offices:offices}, Prestige.showNotesModal);
+		$('.prestige-note-button').off().click({offices:offices}, PrestigeSearch.showNotesModal);
 	}
 	
 	function fetchPrestigeLog()
 	{
+		let idUsersSearch =$('#prestige_id_users').val(); 
+		if(!idUsersSearch)
+		{
+			return;
+		}
+		
 		let data = {
 			action:'fetch_user_prestige',
-			id_users:$('#prestige_id_users').val()
+			id_users:idUsersSearch
 		};
 		$.post(
 			ajaxurl,
@@ -88,39 +167,6 @@
 			order:[[4, 'desc']],
 		});
 		bindNotesButtons();
-	}
-	
-	function showNotes()
-	{
-		let $button = $(this);
-		$row = $button.closest('tr');
-		let	data = $row.data(),
-			notes = data.notes,
-			$notesTable =$('#prestige-notes').empty(),
-			currentStatus = notes[notes.length - 1].note_status,
-			$status_button = $(`input[name='prestige_record_approved'][value='${currentStatus}']`);
-		$('.prestige-record-approved').removeClass('active');
-		$status_button.prop('checked', true);
-		$status_button.closest('.prestige-record-approved').addClass('active');
-		$('#prestige_record_approved').val('Submitted');
-		$('#notes_prestige_record_id').val(data.id);
-		for(let note of notes)
-		{
-			$('<tr/>')
-				.append($('<td/>').text(note.note))
-				.append($('<td/>').text(note.status))
-				.append($('<td/>').text(note.note_date))
-				.appendTo($notesTable);
-		}
-		if(editable)
-		{
-			$('#prestige_record_note_btn').removeAttr('disabled');
-		}
-		else
-		{
-			$('#prestige_record_note_btn').attr('disabled', true);
-		}
-		$('#prestigeNotesModalDialog').modal('show');
 	}
 	
 	function addPrestigeNote()

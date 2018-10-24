@@ -20,7 +20,7 @@
 		<div class="tab-content" id="recordsTabs"></div>
 	</div>
 
-<button class="btn btn-primary" id="addPrestigeReward">Add Prestige Reward</button>
+	<button class="btn btn-primary" id="addPrestigeReward">Add Prestige Reward</button>
 </div>
 
 <?php require_once (plugin_dir_path(__FILE__)."prestige-claim.modal.php"); ?>

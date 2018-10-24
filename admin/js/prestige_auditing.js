@@ -170,6 +170,11 @@
 		populateSelect('#id_domains', domains, 'name', populateOffices);
 	}
 	
+	function populateActions()
+	{
+		populateSelect('#id_prestige_actions', prestigeActions.filter(action => action.id_prestige_category === $('#id_prestige_categories').val()), 'description');
+	}
+	
 	function populateOffices()
 	{
 		// so, this one needs a bit of unpacking: any offices that are held by the admin user should be ignored.
@@ -177,11 +182,6 @@
 		// other than that, just match the domain to the chosen domain and the chain to the chosen chain.
 		let relevantOffices = offices.filter(office=>(office.id_users !== "1" && (!office.venue || (office.active && office.active === '1')) && office.id_domains === $('#id_domains').val() && office.chain === $('#chain').val()));
 		populateSelect('#id_officers', relevantOffices, 'full_title');
-	}
-	
-	function populateActions()
-	{
-		populateSelect('#id_prestige_actions', prestigeActions.filter(action => action.id_prestige_category === $('#id_prestige_categories').val()), 'description');
 	}
 	
 	function bindEvents()

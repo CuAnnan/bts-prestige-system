@@ -79,9 +79,10 @@ class Domains
 	public static function show_domain_management_page()
 	{
 		$managed_domains = self::get_managed_domains();
-		$officers		= \BTS_Prestige\Admin\Offices::get_offices_by_id_domains($managed_domains);
-		$genres			= \BTS_Prestige\Admin\Genres::get_genres();
-		$usersMetaData	= \BTS_Prestige\Admin\Users::getUsermeta();
-		require_once plugin_dir_path(__FILE__).'/partials/bts-prestige-system-management-page.php';
+		$officers		= Offices::get_offices_by_id_domains($managed_domains);
+		$genres			= Genres::get_genres();
+		$venues			= Venues::get_venues_by_domains();
+		$usersMetaData	= Users::getUsermeta();
+		require_once plugin_dir_path(__FILE__).'/partials/domain-management.php';
 	}
 }

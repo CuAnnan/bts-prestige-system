@@ -29,42 +29,85 @@ function convert_officer_row_to_data($officer)
 echo '<script type="text/json" id="allUsersMeta">'.json_encode($usersMetaData).'</script>'."\n";
 echo '<script type="text/json" id="officerHeirarchy">'.json_encode($officers).'</script>';
 ?>
-	<table>
-	<?php
-		foreach($managed_domains as $managed_domain)
+	<ul class="nav nav-tabs" id="domainsTab" role="tablist"><?php
+		$first = true;
+		foreach($managed_domains as $domain)
 		{
-	?>
-		<tbody class="domain" data-id-domains="<?php echo $managed_domain->id; ?>">
-			<tr>
-				<th colspan="7">
-					<?php echo $managed_domain->name;?> -
-					<?php echo $managed_domain->location;?> -
-					<?php echo $managed_domain->number; ?>
-				</th>
-			</tr>
-			<?php
-				if(isset($officers[$managed_domain->id]))
-				{
-					foreach($officers[$managed_domain->id] as $officer){ ?>
-					<tr <?php echo convert_officer_row_to_data($officer); ?>>
-						<td class="tr_office_title"><?php echo $officer->title ?></td>
-						<td class="tr_office_genre_name"><?php echo $officer->genre_name?$officer->genre_name:'&nbsp;'; ?></td>
-						<td class="tr_office_name"><?php echo $officer->first_name.' '.$officer->last_name; ?></td>
-						<td class="tr_office_membership_number"><?php echo $officer->membership_number; ?></td>
-						<td class="tr_office_date_appointed"><?php echo $officer->date_appointed; ?></td>
-						<td><button class="btn btn-sm btn-primary btn_edit_office">Edit</button></td>
-						<td><button class="btn btn-sm btn-danger btn_delete_office">Delete</button></td>
-					</tr>
-			<?php	
-					}
-				}
-			?>
-		</tbody>
+	?>	<li class="nav-item">
+			<a class="nav-link<?php echo $first?' active':''?>" id="domain_<?php echo $domain->id?>-tab" data-toggle="tab" href="#domain_<?php echo $domain->id?>" role="tab" aria-controls="domain_<?php echo $domain->id?>" aria-selected="<?php echo $first?'true':'false'?>"><?php echo $domain->name;?></a>
+		</li>
 	<?php
+			$first = false;
 		}
 	?>
-	</table>
-	
+	</ul>
+	<div class="tab-content" id="domainsTabContent">
+		
+	<?php
+		$first = true;
+		foreach($managed_domains as $domain)
+		{
+	?>
+		<div role="tabpanel" class="tab-pane fade domain<?php echo $first?' show active':''?>" id="domain_<?php echo $domain->id?>" data-id-domains="<?php echo $domain->id ?>">
+			<?php if(isset($venues[$domain->id])){?>
+			<div class="expansionContainer">
+				<h4>Venue List <button class="btn btn-secondary expander">+</button></h4>
+				<div class="venueList expandable">
+				<?php
+					foreach($venues[$domain->id] as $venue)
+					{
+						$id_venue = $venue->id;
+						$venue_offices = array_filter($officers[$domain->id], function($officer) use($id_venue){
+							return $officer->id_venues == $id_venue;
+						});
+				?>
+					<div class="row">
+						<div class="col">
+							<h5><?php echo $venue->genre ?> - (<?php echo $venue->name?>)</h5>
+							<?php foreach($venue_offices as $venue_office)
+							{
+							?>
+							<div class="row">
+								<div class="col"><?php echo $venue_office->office_title; ?></div>
+							</div>
+							<?php
+							}
+							?>
+						</div>
+					</div>
+				<?php
+					}
+				?>
+				</div>
+			</div>
+			<?php } ?>
+			<div class="expansionContainer">
+				<h4>Officer list <button class="btn btn-secondary expander">+</button></h4>
+				<div class="officerList expandable">
+				<?php
+					if(isset($officers[$domain->id]))
+					{
+						foreach($officers[$domain->id] as $officer){ ?>
+						<div class="row" <?php echo convert_officer_row_to_data($officer); ?>>
+							<div class="col tr_office_title"><?php echo $officer->title ?><?php echo $officer->genre_name?' - '.$officer->genre_name:''; ?></div>
+							<div class="col-3 tr_office_name"><?php echo $officer->first_name.' '.$officer->last_name; ?> (<?php echo $officer->membership_number; ?>)</div>
+							<div class="col-2">
+								<button class="btn btn-sm btn-primary btn_edit_office">Edit</button>
+								<button class="btn btn-sm btn-danger btn_delete_office">Delete</button>
+							</div>
+						</div>
+					<?php	
+						}
+					}
+				?>
+				</div>
+			</div>
+		</div>
+	<?php
+			$first = false;
+		}
+	?>
+	</div>
 	<button class="btn btn-primary" id="reset_permissions_button">Reset all permissions</button>
 
 <div class="modal" id="editOfficeModal" tabindex="-1" role="dialog">

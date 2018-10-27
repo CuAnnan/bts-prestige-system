@@ -24,6 +24,7 @@
 		$('.btn_edit_office').click(editOffice);
 		$('#updateModalButton').click(updateOffice);
 		$('#reset_permissions_button').click(resetPermissions);
+		$('.expander').click(expandExpander);
 	}
 	
 	function resetPermissions()
@@ -65,7 +66,7 @@
 	function editOffice()
 	{
 		let $button = $(this);
-		$tr = $button.closest('tr');
+		$tr = $button.closest('.row');
 		let	officeData = $tr.data(),
 			officerList = officersJSON[officeData.idDomains],
 			$select = $('#office_edit_id_superior').empty().append(
@@ -168,6 +169,15 @@
 	{
 		updateTRData(data);
 		updateRow(data);
+	}
+	
+	function expandExpander()
+	{
+		let $button = $(this),
+			$container = $button.closest('.expansionContainer'),
+			$expandable = $('.expandable', $container).first();
+		$button.text($expandable.css('display')==='none'?'-':'+');
+		$expandable.toggle();
 	}
 	
 })( jQuery );

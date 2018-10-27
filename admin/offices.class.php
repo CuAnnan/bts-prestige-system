@@ -30,6 +30,7 @@ class Offices
 				o.title				AS title,
 				o.email				AS email,
 				oo.chain			AS chain,
+				oo.title			AS office_title,
 				o.id_superior		AS id_superior,
 				o.date_appointed	AS date_appointed,
 				um_fn.meta_value	AS first_name,
@@ -66,10 +67,7 @@ class Offices
 		$offices = [];
 		foreach($results as $result)
 		{
-			if(!isset($offices[$result->id_domains]))
-			{
-				$offices[$result->id_domains] = [];
-			}
+			$offices[$result->id_domains] = $offices[$result->id_domains]?$offices[$result->id_domains]:[];
 			$offices[$result->id_domains][] = $result;
 		}
 		return $offices;

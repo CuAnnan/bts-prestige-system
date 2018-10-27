@@ -2,3 +2,14 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+.domain
+{
+	width: 90%;
+	margin-left: auto;
+}
+
+.expandable
+{
+	display: none;
+}

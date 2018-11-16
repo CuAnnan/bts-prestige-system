@@ -234,6 +234,13 @@ class Admin
                 filter_input(INPUT_POST, 'nmc_code'),
                 filter_input(INPUT_POST, 'active')
             ));
+        }       
+        public function add_genre()
+        {
+            $this->return_json(Genres::add_genre(
+                filter_input(INPUT_POST, 'name'),
+                filter_input(INPUT_POST, 'short_name')
+            ));
         }
 	
 	public function edit_prestige_record()

@@ -161,6 +161,7 @@ class Bts_Prestige_System {
 		$this->loader->add_action( 'wp_ajax_edit_prestige_record',	$plugin_admin, 'edit_prestige_record');
                 $this->loader->add_action( 'wp_ajax_add_domain',                $plugin_admin, 'add_domain');
                 $this->loader->add_action( 'wp_ajax_add_venue_to_domain',       $plugin_admin, 'add_venue_to_domain');
+                $this->loader->add_action( 'wp_ajax_add_genre',                 $plugin_admin, 'add_genre');
         }
 	
 	private function add_admin_menus($plugin_admin)

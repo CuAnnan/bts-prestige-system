@@ -5,8 +5,7 @@ class Venues
 	public static function get_managed_venues_for_id_users($id_users)
 	{
 		global $wpdb;
-		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
-		
+		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;	
 		return $wpdb->get_results($wpdb->prepare("
 			SELECT
 				v.id				AS id,
@@ -80,4 +79,20 @@ class Venues
 						v.id_domains IS NOT NULL
 				AND		v.active = 1");
 	}
+        
+        public static function add_venue_to_domain($name, $id_domains, $id_genres, $nmc_code, $active)
+        {
+            global $wpdb;
+            $prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+            $wpdb->insert(
+                $prefix.'venues',
+                [
+                    'name'=>$name,
+                    'id_domains'=>$id_domains,
+                    'id_genres'=>$id_genres,
+                    'nmc_code'=>$nmc_code,
+                    'active'=>$active
+                ]
+            );
+        }
 }

@@ -213,6 +213,28 @@ class Admin
 			filter_input(INPUT_POST, 'date')
 		));
 	}
+        
+        public function add_domain()
+        {
+            $this->return_json(Domains::add_domain(
+                filter_input(INPUT_POST, 'name'),
+                filter_input(INPUT_POST, 'nmc_code'),
+                filter_input(INPUT_POST, 'number'),
+                filter_input(INPUT_POST, 'location'),
+                filter_input(INPUT_POST, 'parent_id')
+            ));
+        }
+        
+        public function add_venue_to_domain()
+        {
+            $this->return_json(Venues::add_venue_to_domain(
+                filter_input(INPUT_POST, 'name'),
+                filter_input(INPUT_POST, 'id_domains'),
+                filter_input(INPUT_POST, 'id_genres'),
+                filter_input(INPUT_POST, 'nmc_code'),
+                filter_input(INPUT_POST, 'active')
+            ));
+        }
 	
 	public function edit_prestige_record()
 	{

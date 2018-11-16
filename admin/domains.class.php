@@ -31,20 +31,37 @@ class Domains
 	
 	public static function get_all_domains()
 	{
-		global $wpdb;
-		$prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
-		
-		return $wpdb->get_results("SELECT
-				d.id				AS id,
-				d.name				AS name,
-				d.nmc_code			AS nmc_code,
-				d.number			AS number,
-				d.location			AS location
-			FROM
-				{$prefix}domains d
-			ORDER 
-				BY id");
+            global $wpdb;
+            $prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+
+            return $wpdb->get_results("SELECT
+                            d.id				AS id,
+                            d.name				AS name,
+                            d.nmc_code			AS nmc_code,
+                            d.number			AS number,
+                            d.location			AS location
+                    FROM
+                            {$prefix}domains d
+                    ORDER 
+                            BY id");
 	}
+        
+        public static function add_domain($name, $nmc_code, $number, $location, $parent_id)
+        {
+            global $wpdb;
+            $prefix = $wpdb->prefix.BTS_TABLE_PREFIX;
+            $wpdb->insert(
+                $prefix.'domains',
+                [
+                    'name'=>$name,
+                    'nmc_code'=>$nmc_code,
+                    'number'=>$number,
+                    'location'=>$location,
+                    'parent_domain_id'=>$parent_id
+                ]
+            );
+            return $wpdb->insert_id;
+        }
 	
 	public static function get_managed_domains()
 	{
